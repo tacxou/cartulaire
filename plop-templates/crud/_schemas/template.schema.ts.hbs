@@ -1,0 +1,19 @@
+import { Types, HydratedDocument } from 'mongoose'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { AbstractSchema } from '~/_common/_abstracts/_schemas/abstract.schema'
+
+@Schema({
+  collection: '{{ camelCase (plural name) }}',
+  versionKey: false,
+})
+export class {{ pascalCase name }} extends AbstractSchema {
+  @Prop({
+  type: String,
+  required: true,
+  })
+  public name: string
+}
+
+export type {{ pascalCase name }}Document = HydratedDocument<{{ pascalCase name }}>
+
+export const {{ pascalCase name }}Schema = SchemaFactory.createForClass({{ pascalCase name }})

@@ -1,0 +1,109 @@
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common'
+import { ApiParam, ApiTags } from '@nestjs/swagger'
+import {
+  FilterOptions,
+  FilterSchema,
+  ObjectIdValidationPipe,
+  SearchFilterOptions,
+  SearchFilterSchema,
+} from '@tacxou/nestjs_module_restools'
+import { Response } from 'express'
+import { Types } from 'mongoose'
+import { ApiCreateDecorator } from '~/_common/_decorators/api-create.decorator'
+import { ApiReadResponseDecorator } from '~/_common/_decorators/api-read-response.decorator'
+import { ApiUpdateDecorator } from '~/_common/_decorators/api-update.decorator'
+import { {{ pascalCase name }}CreateDto, {{ pascalCase name }}Dto, {{ pascalCase name }}UpdateDto } from './_dtos/{{ kebabCase name }}.dto'
+import { {{ pascalCase (plural name) }}Service } from './{{ kebabCase (plural name) }}.service'
+import { ApiDeletedResponseDecorator } from '~/_common/_decorators/api-deleted-response.decorator'
+import { PartialProjectionType } from '~/_common/_types/partial-projection.type'
+import { ApiPaginatedDecorator } from '~/_common/_decorators/api-paginated.decorator'
+import { PickProjectionHelper } from '~/_common/_helpers/pick-projection.helper'
+
+{{#if parent}}
+@ApiTags('{{ kebabCase parent }}')
+{{/if}}
+@Controller('{{ kebabCase (plural name) }}')
+export class {{ pascalCase (plural name) }}Controller {
+  public constructor(private readonly _service: {{ pascalCase (plural name) }}Service) {}
+
+  protected static readonly projection: PartialProjectionType<{{ pascalCase name }}Dto> = {
+    // TODO: add projection fields
+  }
+
+  @Get()
+  @ApiPaginatedDecorator(PickProjectionHelper({{ pascalCase name }}Dto, {{ pascalCase (plural name) }}Controller.projection))
+  public async search(
+    @Res() res: Response,
+    @SearchFilterSchema() searchFilterSchema: FilterSchema,
+    @SearchFilterOptions() searchFilterOptions: FilterOptions,
+  ): Promise<Response> {
+    const [data, total] = await this._service.findAndCount(
+      searchFilterSchema,
+      {{ pascalCase (plural name) }}Controller.projection,
+      searchFilterOptions,
+    )
+
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      total,
+      data,
+    })
+  }
+
+  @Post()
+  @ApiCreateDecorator({{ pascalCase name }}CreateDto, {{ pascalCase name }}Dto)
+  public async create(@Res() res: Response, @Body() body: {{ pascalCase name }}CreateDto): Promise<Response> {
+    const data = await this._service.create(body)
+
+    return res.status(HttpStatus.CREATED).json({
+      statusCode: HttpStatus.CREATED,
+      data,
+    })
+  }
+
+  @Get(':_id')
+  @ApiParam({ name: '_id', type: String })
+  @ApiReadResponseDecorator({{ pascalCase name }}Dto)
+  public async read(
+    @Param('_id', ObjectIdValidationPipe) _id: Types.ObjectId,
+    @Res() res: Response,
+  ): Promise<Response> {
+    const data = await this._service.findById(_id)
+
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data,
+    })
+  }
+
+  @Patch(':_id')
+  @ApiParam({ name: '_id', type: String })
+  @ApiUpdateDecorator({{ pascalCase name }}UpdateDto, {{ pascalCase name }}Dto)
+  public async update(
+    @Param('_id', ObjectIdValidationPipe) _id: Types.ObjectId,
+    @Body() body: {{ pascalCase name }}UpdateDto,
+    @Res() res: Response,
+  ): Promise<Response> {
+    const data = await this._service.update(_id, body)
+
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data,
+    })
+  }
+
+  @Delete(':_id')
+  @ApiParam({ name: '_id', type: String })
+  @ApiDeletedResponseDecorator({{ pascalCase name }}Dto)
+  public async remove(
+    @Param('_id', ObjectIdValidationPipe) _id: Types.ObjectId,
+    @Res() res: Response,
+  ): Promise<Response> {
+    const data = await this._service.delete(_id)
+
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data,
+    })
+  }
+}

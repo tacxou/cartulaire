@@ -1,0 +1,15 @@
+import { ApiProperty, PartialType } from '@nestjs/swagger'
+import { IsDate, IsMongoId, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator'
+import { MetadataDto } from '~/_common/_abstracts/_dtos/metadata.dto'
+
+export class {{ pascalCase name }}CreateDto extends MetadataDto {
+  // TODO: add create dto fields
+}
+
+export class {{ pascalCase name }}Dto extends {{ pascalCase name }}CreateDto {
+  @IsMongoId()
+  @ApiProperty({ type: String })
+  public _id: string
+}
+
+export class {{ pascalCase name }}UpdateDto extends PartialType({{ pascalCase name }}CreateDto) {}

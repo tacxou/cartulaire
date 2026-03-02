@@ -1,0 +1,19 @@
+import { Module } from '@nestjs/common'
+import { {{ pascalCase (plural name) }}Controller } from './{{ kebabCase (plural name) }}.controller'
+import { {{ pascalCase (plural name) }}Service } from './{{ kebabCase (plural name) }}.service'
+import { MongooseModule } from '@nestjs/mongoose'
+import { {{ pascalCase (plural name) }}, {{ pascalCase (plural name) }}Schema } from './_schemas/{{ kebabCase (plural name) }}.schema'
+
+@Module({
+  imports: [
+    MongooseModule.forFeatureAsync([
+      {
+      name: {{ pascalCase (plural name) }}.name,
+      useFactory: () => {{ pascalCase (plural name) }}Schema,
+      },
+    ]),
+  ],
+  controllers: [{{ pascalCase (plural name) }}Controller],
+  providers: [{{ pascalCase (plural name) }}Service],
+})
+export class {{ pascalCase (plural name) }}Module {}
