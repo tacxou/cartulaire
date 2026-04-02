@@ -1,0 +1,156 @@
+{% extends "layouts/main.njk" %}
+
+{% block content %}
+<style>
+  /* Thème warning orange — page déconnexion uniquement */
+  .logout-page .glass-shell {
+    border-color: rgba(251, 146, 60, 0.22);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(251, 146, 60, 0.12) inset,
+      0 0 40px -12px rgba(249, 115, 22, 0.15);
+  }
+  .logout-page .logout-tint {
+    background: linear-gradient(
+      155deg,
+      rgba(249, 115, 22, 0.14) 0%,
+      rgba(24, 20, 18, 0.45) 48%,
+      rgba(12, 10, 9, 0.55) 100%
+    );
+    -webkit-backdrop-filter: saturate(160%) blur(28px);
+    backdrop-filter: saturate(160%) blur(28px);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .logout-page .btn-logout-warn {
+    background: linear-gradient(180deg, #fb923c 0%, #ea580c 100%);
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border: none;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset, 0 4px 24px rgba(234, 88, 12, 0.4);
+  }
+  .logout-page .btn-logout-warn:hover {
+    background: linear-gradient(180deg, #fdba74 0%, #f97316 100%);
+  }
+  .logout-page .btn-logout-warn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.45), 0 1px 0 rgba(255, 255, 255, 0.22) inset;
+  }
+</style>
+
+<div class="logout-page w-full max-w-4xl overflow-hidden rounded-[1.75rem] glass-shell">
+  <div class="grid md:grid-cols-2">
+    <div
+      class="logout-tint relative hidden md:flex flex-col items-center justify-center text-center p-10 lg:p-12 text-zinc-100 min-h-[22rem] md:min-h-[28rem]"
+    >
+      <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div class="absolute -top-24 -left-16 h-64 w-64 rounded-full bg-orange-500/20 blur-3xl"></div>
+        <div class="absolute -bottom-20 -right-10 h-56 w-56 rounded-full bg-amber-600/15 blur-3xl"></div>
+      </div>
+      <div class="relative max-w-[280px]">
+        <div
+          class="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl border border-orange-400/25 bg-orange-500/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+        >
+          <iconify-icon icon="carbon:logout" class="h-10 w-10 text-orange-300" aria-hidden="true"></iconify-icon>
+        </div>
+        <h1 class="mt-8 text-[1.65rem] lg:text-[1.85rem] font-semibold tracking-tight text-zinc-50 leading-tight">
+          Fin de session
+        </h1>
+        <p class="mt-4 text-[15px] leading-relaxed text-zinc-400">
+          Confirmez si vous souhaitez fermer votre session sur cet appareil.
+        </p>
+        <p class="mt-8 text-[11px] text-orange-200/40">OIDC · Déconnexion sécurisée</p>
+      </div>
+    </div>
+
+    <div class="p-8 sm:p-10 lg:p-12 glass-inner backdrop-blur-sm">
+      <div class="flex flex-col items-center md:items-start mb-8 md:mb-9">
+        <img
+          src="/logo.png"
+          width="112"
+          height="112"
+          alt=""
+          decoding="async"
+          class="md:hidden w-24 h-24 object-contain select-none"
+        />
+        <div class="mt-6 md:mt-0 w-full text-center md:text-left md:flex md:items-center md:gap-4">
+          <img
+            src="/logo.png"
+            width="112"
+            height="112"
+            alt=""
+            decoding="async"
+            class="hidden md:block shrink-0 w-14 h-14 object-contain select-none"
+          />
+          <div class="md:pt-0">
+            <h2 class="text-2xl font-semibold tracking-tight text-zinc-50">Déconnexion</h2>
+            <p class="mt-1.5 text-[15px] text-orange-200/55">Action sensible — une dernière confirmation</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-[15px] text-zinc-400 leading-relaxed text-center md:text-left">
+        {% if clientDisplay %}
+        Confirmez-vous la déconnexion pour l’application ci-dessous ?
+        {% else %}
+        Voulez-vous vous déconnecter ?
+        {% endif %}
+      </p>
+
+      {% if clientDisplay %}
+      <div
+        class="mt-5 rounded-2xl border border-orange-500/25 bg-orange-500/10 px-4 py-3 flex items-center gap-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+        role="status"
+      >
+        <span
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-orange-400/20 bg-orange-500/15"
+          aria-hidden="true"
+        >
+          <iconify-icon icon="carbon:application" class="h-[18px] w-[18px] text-orange-300" aria-hidden="true"></iconify-icon>
+        </span>
+        <div class="min-w-0 text-left">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-orange-200/45">Application</p>
+          <p class="mt-0.5 text-[15px] font-medium text-zinc-100 truncate" title="{{ clientDisplay }}">
+            {{ clientDisplay }}
+          </p>
+        </div>
+      </div>
+      {% endif %}
+
+      {# Formulaire OIDC (xsrf + action) — obligatoire pour que form="op.logoutForm" sur les boutons fonctionne #}
+      <div class="[&_form]:m-0">{{ formHtml | safe }}</div>
+
+      <div class="mt-5 grid gap-3">
+        <button
+          autofocus
+          type="submit"
+          form="op.logoutForm"
+          value="yes"
+          name="logout"
+          class="btn-logout-warn group relative w-full overflow-hidden rounded-full px-4 py-3.5 text-[15px] transition active:scale-[0.99]"
+        >
+          <span class="relative z-10 inline-flex w-full items-center justify-center gap-2">
+            <iconify-icon icon="carbon:logout" class="h-5 w-5 opacity-95" aria-hidden="true"></iconify-icon>
+            Oui, me déconnecter
+          </span>
+        </button>
+        <button
+          type="button"
+          class="btn-glass w-full rounded-full px-4 py-3.5 text-[15px] font-medium transition active:scale-[0.99] inline-flex items-center justify-center gap-2 border-orange-400/15 hover:bg-orange-500/10"
+          onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.assign('/'); }"
+        >
+          <iconify-icon icon="carbon:chevron-left" class="h-5 w-5 text-orange-200/50" aria-hidden="true"></iconify-icon>
+          Non, rester connecté
+        </button>
+      </div>
+
+      <div
+        class="mt-6 flex gap-3 rounded-2xl border border-orange-500/20 bg-orange-950/30 px-4 py-3 text-left"
+      >
+        <iconify-icon icon="carbon:error-outline" class="mt-0.5 h-4 w-4 shrink-0 text-orange-400/70" aria-hidden="true"></iconify-icon>
+        <p class="text-[12px] text-orange-100/45 leading-relaxed">
+          Vous pouvez aussi fermer cet onglet : votre session reste alors active.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

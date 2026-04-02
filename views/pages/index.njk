@@ -1,3 +1,374 @@
 {% extends "layouts/main.njk" %}
 
-{% block content %}{% endblock %}
+{% block head_extra %}
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  .page-index { font-family: 'Sora', sans-serif; }
+  .page-index .bg-grid {
+    background-image:
+      linear-gradient(rgba(100,80,255,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(100,80,255,.05) 1px, transparent 1px);
+    background-size: 52px 52px;
+  }
+  .page-index .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+  }
+  .page-index .glass {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.09);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .page-index .glass-strong {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.11);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+  }
+  .page-index .dot-live {
+    animation: pulseDot 2s ease-in-out infinite;
+  }
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .3; }
+  }
+  .page-index .app-card {
+    transition: transform .22s ease, border-color .22s ease, background .22s ease;
+  }
+  .page-index .app-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124,58,237,.4) !important;
+    background: rgba(124,58,237,.07) !important;
+  }
+  .page-index .text-gradient {
+    background: linear-gradient(130deg, #c4b5fd 10%, #7c3aed 60%, #4c1d95);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-index relative min-h-screen flex flex-col">
+  <!-- Background orbs -->
+  <div class="orb w-[600px] h-[600px] bg-[#2d1469] opacity-30 top-[-200px] left-[-150px]"></div>
+  <div class="orb w-[400px] h-[400px] bg-[#1e1b4b] opacity-35 bottom-0 right-[-100px]"></div>
+  <div class="orb w-[280px] h-[280px] bg-[#312e81] opacity-25 top-[40%] left-[55%]"></div>
+  <div class="bg-grid absolute inset-0 pointer-events-none"></div>
+
+  <header class="relative z-20 flex flex-wrap items-center justify-between gap-4 px-6 sm:px-12 py-4 border-b border-white/5"
+          style="background: rgba(6,6,14,.75); backdrop-filter: blur(20px);">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0"
+           style="background: linear-gradient(145deg,#7c3aed,#4c1d95); box-shadow: 0 0 0 1px rgba(124,58,237,.4), 0 4px 16px rgba(124,58,237,.25);">
+        <iconify-icon icon="carbon:security" width="18" height="18" class="text-white" aria-hidden="true"></iconify-icon>
+      </div>
+      <span class="text-[15px] font-extrabold text-[#f5f3ff] tracking-[2px] uppercase">Cartulaire</span>
+      <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-[#a78bfa] tracking-[.5px] uppercase"
+            style="background: rgba(124,58,237,.1); border: 1px solid rgba(124,58,237,.22);">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#7c3aed] dot-live"></span>
+        SSO actif
+      </span>
+    </div>
+
+    <nav class="flex flex-wrap items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto">
+      <a href="#" class="text-[12px] text-[#3d3a5c] font-medium hover:text-[#9490b8] transition-colors">Documentation</a>
+      <a href="#" class="text-[12px] text-[#3d3a5c] font-medium hover:text-[#9490b8] transition-colors">Support</a>
+      <div class="w-px h-5 bg-white/[.07] mx-1 hidden sm:block"></div>
+      <span class="text-[12px] text-[#3d3a5c] font-medium truncate max-w-[12rem]" title="{{ issuerHost }}">{{ issuerHost }}</span>
+      <div class="w-px h-5 bg-white/[.07] mx-1 hidden sm:block"></div>
+      <a href="/login"
+         class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-all"
+         style="background: linear-gradient(135deg,#7c3aed,#5b21b6); border: 1px solid rgba(139,92,246,.35); box-shadow: 0 2px 16px rgba(124,58,237,.3);">
+        <iconify-icon icon="carbon:login" width="14" height="14" aria-hidden="true"></iconify-icon>
+        Connexion
+      </a>
+    </nav>
+  </header>
+
+  <main class="relative z-10 flex-1 max-w-[1100px] w-full mx-auto px-6 sm:px-12">
+    <section class="text-center pt-10 sm:pt-14 pb-10">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-semibold text-[#a78bfa] tracking-[.6px] uppercase mb-7"
+           style="background: rgba(124,58,237,.09); border: 1px solid rgba(124,58,237,.2);">
+        <iconify-icon icon="carbon:security" width="11" height="11" aria-hidden="true"></iconify-icon>
+        Serveur d'identité OIDC ·
+      </div>
+
+      <h1 class="text-[clamp(1.75rem,5vw,2.875rem)] font-extrabold text-[#f5f3ff] leading-[1.1] tracking-tight mb-5">
+        Une identité.<br>
+        <span class="text-gradient">Tous vos accès.</span>
+      </h1>
+      <p class="text-[15px] text-[#5e5a7a] leading-relaxed max-w-[400px] mx-auto">
+        Connectez-vous à vos applications via votre identité unique.<br>
+        Authentification OIDC · chiffrement de bout en bout.
+      </p>
+    </section>
+
+    <section class="mb-5">
+      <div class="flex items-center gap-2.5 mb-5">
+        <iconify-icon icon="carbon:grid" width="13" height="13" style="color: #7c3aed" aria-hidden="true"></iconify-icon>
+        <span class="text-[11px] font-bold text-[#5b4f8a] tracking-[1px] uppercase">Applications disponibles</span>
+        <span class="ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
+              style="background: rgba(124,58,237,.15); color: #a78bfa; border: 1px solid rgba(124,58,237,.25);">7</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="glass app-card rounded-2xl p-5 cursor-pointer">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
+                 style="background: linear-gradient(145deg,#0ea5e9,#0369a1); box-shadow: 0 4px 14px rgba(14,165,233,.2);">
+              <iconify-icon icon="carbon:email" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+            </div>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
+          </div>
+          <div class="text-[14px] font-bold text-[#f0eeff] mb-1">Messagerie</div>
+          <div class="text-[11px] text-[#4e4a6a] mb-1">Communication</div>
+          <div class="text-[11px] text-[#4e4a6a] leading-relaxed mb-4">Courrier et notifications internes</div>
+          <div class="h-px bg-white/[.06] mb-3.5"></div>
+          <div class="flex items-center justify-between">
+            <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
+              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>89
+            </span>
+            <a href="/auth?client=messagerie"
+               class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
+               style="background: linear-gradient(135deg,#7c3aed,#5b21b6);">Accéder</a>
+          </div>
+        </div>
+
+        <div class="glass app-card rounded-2xl p-5 cursor-pointer">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
+                 style="background: linear-gradient(145deg,#10b981,#047857); box-shadow: 0 4px 14px rgba(16,185,129,.2);">
+              <iconify-icon icon="carbon:calendar" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+            </div>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
+          </div>
+          <div class="text-[14px] font-bold text-[#f0eeff] mb-1">Calendrier</div>
+          <div class="text-[11px] text-[#4e4a6a] mb-1">Productivité</div>
+          <div class="text-[11px] text-[#4e4a6a] leading-relaxed mb-4">Agenda partagé et planification</div>
+          <div class="h-px bg-white/[.06] mb-3.5"></div>
+          <div class="flex items-center justify-between">
+            <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
+              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>64
+            </span>
+            <a href="/auth?client=calendrier"
+               class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
+               style="background: linear-gradient(135deg,#7c3aed,#5b21b6);">Accéder</a>
+          </div>
+        </div>
+
+        <div class="glass app-card rounded-2xl p-5 cursor-pointer">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
+                 style="background: linear-gradient(145deg,#f59e0b,#b45309); box-shadow: 0 4px 14px rgba(245,158,11,.2);">
+              <iconify-icon icon="carbon:document" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+            </div>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
+          </div>
+          <div class="text-[14px] font-bold text-[#f0eeff] mb-1">Documents</div>
+          <div class="text-[11px] text-[#4e4a6a] mb-1">Productivité</div>
+          <div class="text-[11px] text-[#4e4a6a] leading-relaxed mb-4">Gestion et partage de fichiers</div>
+          <div class="h-px bg-white/[.06] mb-3.5"></div>
+          <div class="flex items-center justify-between">
+            <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
+              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>117
+            </span>
+            <a href="/auth?client=documents"
+               class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
+               style="background: linear-gradient(135deg,#7c3aed,#5b21b6);">Accéder</a>
+          </div>
+        </div>
+
+        <div class="glass app-card rounded-2xl p-5 cursor-pointer">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
+                 style="background: linear-gradient(145deg,#ec4899,#9d174d); box-shadow: 0 4px 14px rgba(236,72,153,.2);">
+              <iconify-icon icon="carbon:group" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full mt-0.5"
+                  style="background: rgba(236,72,153,.1); color: #f9a8d4; border: 1px solid rgba(236,72,153,.25);">RH</span>
+          </div>
+          <div class="text-[14px] font-bold text-[#f0eeff] mb-1">Portail RH</div>
+          <div class="text-[11px] text-[#4e4a6a] mb-1">Ressources Humaines</div>
+          <div class="text-[11px] text-[#4e4a6a] leading-relaxed mb-4">Congés, paie et suivi des équipes</div>
+          <div class="h-px bg-white/[.06] mb-3.5"></div>
+          <div class="flex items-center justify-between">
+            <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
+              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>38
+            </span>
+            <a href="/auth?client=rh"
+               class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
+               style="background: linear-gradient(135deg,#7c3aed,#5b21b6);">Accéder</a>
+          </div>
+        </div>
+
+        <div class="glass app-card rounded-2xl p-5 cursor-pointer">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
+                 style="background: linear-gradient(145deg,#6366f1,#4338ca); box-shadow: 0 4px 14px rgba(99,102,241,.2);">
+              <iconify-icon icon="carbon:book" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+            </div>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
+          </div>
+          <div class="text-[14px] font-bold text-[#f0eeff] mb-1">Wiki Interne</div>
+          <div class="text-[11px] text-[#4e4a6a] mb-1">Documentation</div>
+          <div class="text-[11px] text-[#4e4a6a] leading-relaxed mb-4">Base de connaissances centralisée</div>
+          <div class="h-px bg-white/[.06] mb-3.5"></div>
+          <div class="flex items-center justify-between">
+            <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
+              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>142
+            </span>
+            <a href="/auth?client=wiki"
+               class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
+               style="background: linear-gradient(135deg,#7c3aed,#5b21b6);">Accéder</a>
+          </div>
+        </div>
+
+        <div class="glass app-card rounded-2xl p-5 cursor-pointer">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
+                 style="background: linear-gradient(145deg,#14b8a6,#0f766e); box-shadow: 0 4px 14px rgba(20,184,166,.2);">
+              <iconify-icon icon="carbon:chart-line" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full mt-0.5"
+                  style="background: rgba(20,184,166,.1); color: #5eead4; border: 1px solid rgba(20,184,166,.25);">Infra</span>
+          </div>
+          <div class="text-[14px] font-bold text-[#f0eeff] mb-1">Supervision</div>
+          <div class="text-[11px] text-[#4e4a6a] mb-1">Infrastructure</div>
+          <div class="text-[11px] text-[#4e4a6a] leading-relaxed mb-4">Monitoring, alertes et métriques</div>
+          <div class="h-px bg-white/[.06] mb-3.5"></div>
+          <div class="flex items-center justify-between">
+            <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
+              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>12
+            </span>
+            <a href="/auth?client=supervision"
+               class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
+               style="background: linear-gradient(135deg,#7c3aed,#5b21b6);">Accéder</a>
+          </div>
+        </div>
+
+        <div class="glass app-card rounded-2xl p-5 cursor-pointer">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
+                 style="background: linear-gradient(145deg,#8b5cf6,#5b21b6); box-shadow: 0 4px 14px rgba(139,92,246,.2);">
+              <iconify-icon icon="carbon:radar" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+            </div>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
+          </div>
+          <div class="text-[14px] font-bold text-[#f0eeff] mb-1">Helpdesk</div>
+          <div class="text-[11px] text-[#4e4a6a] mb-1">Support</div>
+          <div class="text-[11px] text-[#4e4a6a] leading-relaxed mb-4">Tickets et gestion des incidents</div>
+          <div class="h-px bg-white/[.06] mb-3.5"></div>
+          <div class="flex items-center justify-between">
+            <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
+              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>55
+            </span>
+            <a href="/auth?client=helpdesk"
+               class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
+               style="background: linear-gradient(135deg,#7c3aed,#5b21b6);">Accéder</a>
+          </div>
+        </div>
+
+        <div class="glass rounded-2xl p-5 opacity-50 cursor-not-allowed select-none">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-[14px] flex items-center justify-center bg-white/5">
+              <iconify-icon icon="carbon:dashboard" width="22" height="22" style="color: #555" aria-hidden="true"></iconify-icon>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full mt-0.5"
+                  style="background: rgba(107,114,128,.12); color: #6b7280; border: 1px solid rgba(107,114,128,.2);">Bientôt</span>
+          </div>
+          <div class="text-[14px] font-bold text-[#6b6690] mb-1">Dashboard</div>
+          <div class="text-[11px] text-[#3a3756] mb-1">Analytics</div>
+          <div class="text-[11px] text-[#3a3756] leading-relaxed mb-4">Tableaux de bord personnalisés</div>
+          <div class="h-px bg-white/[.04] mb-3.5"></div>
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-[#3a3756]">—</span>
+            <span class="text-[11px] font-medium text-[#3a3756] px-3.5 py-1.5 rounded-[9px]"
+                  style="background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07);">Indisponible</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="flex items-center gap-4 my-8">
+      <div class="flex-1" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,.08)); height: 1px;"></div>
+      <span class="text-[11px] font-bold text-[#3d3756] tracking-[1px] uppercase whitespace-nowrap px-2 text-center">
+        Vous avez déjà un compte Cartulaire ?
+      </span>
+      <div class="flex-1" style="background: linear-gradient(90deg, rgba(255,255,255,.08), transparent); height: 1px;"></div>
+    </div>
+
+    <section class="glass-strong rounded-3xl overflow-hidden relative mb-14"
+             style="border: 1px solid rgba(124,58,237,.2);">
+      <div class="absolute -top-16 -right-16 w-72 h-72 rounded-full pointer-events-none"
+           style="background: radial-gradient(circle, rgba(124,58,237,.2), transparent 65%);"></div>
+      <div class="absolute -bottom-10 left-[10%] w-48 h-48 rounded-full pointer-events-none"
+           style="background: radial-gradient(circle, rgba(76,29,149,.15), transparent 65%);"></div>
+
+      <div class="relative z-10 flex flex-col lg:flex-row items-stretch lg:items-center gap-8 p-7 sm:p-9">
+        <div class="w-16 h-16 rounded-[18px] flex items-center justify-center shrink-0 mx-auto lg:mx-0"
+             style="background: linear-gradient(145deg,#7c3aed,#4c1d95); box-shadow: 0 0 0 1px rgba(124,58,237,.35), 0 8px 32px rgba(124,58,237,.35);">
+          <iconify-icon icon="carbon:security" width="30" height="30" class="text-white" aria-hidden="true"></iconify-icon>
+        </div>
+
+        <div class="flex-1 text-center lg:text-left">
+          <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-2">
+            <span class="text-[20px] font-extrabold text-[#f5f3ff] tracking-[.5px]">CARTULAIRE</span>
+            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full tracking-[.5px] uppercase"
+                  style="background: rgba(124,58,237,.2); color: #c4b5fd; border: 1px solid rgba(124,58,237,.4);">Compte natif</span>
+          </div>
+          <p class="text-[13px] text-[#6b6690] leading-relaxed max-w-lg mx-auto lg:mx-0">
+            Connectez-vous directement avec vos identifiants Cartulaire pour accéder à l'ensemble de votre espace, gérer vos applications et administrer vos accès.
+          </p>
+          <div class="flex flex-wrap items-center justify-center lg:justify-start gap-5 mt-3">
+            <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
+              <iconify-icon icon="carbon:security" width="11" height="11" style="color: #7c3aed" aria-hidden="true"></iconify-icon>Chiffrement TLS
+            </span>
+            <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
+              <iconify-icon icon="carbon:time" width="11" height="11" style="color: #7c3aed" aria-hidden="true"></iconify-icon>Session 8h
+            </span>
+            <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
+              <iconify-icon icon="carbon:two-factor-authentication" width="11" height="11" style="color: #7c3aed" aria-hidden="true"></iconify-icon>MFA disponible
+            </span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2.5 shrink-0 w-full max-w-sm mx-auto lg:mx-0 lg:w-auto">
+          <a href="/login"
+             class="flex items-center justify-center gap-2 px-8 py-3.5 rounded-[13px] text-[14px] font-bold text-white transition-all"
+             style="background: linear-gradient(135deg,#7c3aed,#5b21b6); border: 1px solid rgba(139,92,246,.35); box-shadow: 0 6px 28px rgba(124,58,237,.4);">
+            <iconify-icon icon="carbon:login" width="15" height="15" aria-hidden="true"></iconify-icon>
+            Se connecter
+          </a>
+          <a href="/register"
+             class="flex items-center justify-center px-8 py-3 rounded-[13px] text-[13px] font-semibold text-[#7a769a] transition-all"
+             style="background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);">
+            Créer un compte
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="relative z-10 border-t border-white/[.05] px-6 sm:px-12 py-4 flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-2">
+      <div class="w-6 h-6 rounded-[6px] flex items-center justify-center"
+           style="background: linear-gradient(145deg,#7c3aed,#4c1d95);">
+        <iconify-icon icon="carbon:security" width="12" height="12" class="text-white" aria-hidden="true"></iconify-icon>
+      </div>
+      <span class="text-[11px] font-bold text-[#2a2742] tracking-[1.5px] uppercase">Cartulaire</span>
+    </div>
+    <span class="text-[11px] text-[#2a2742] text-center">Fournisseur d'identité OIDC · Libertech</span>
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span class="text-[11px] text-[#2a2742]">Tous les services opérationnels</span>
+    </div>
+  </footer>
+</div>
+{% endblock %}

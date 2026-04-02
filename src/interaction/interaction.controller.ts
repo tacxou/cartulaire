@@ -1,13 +1,17 @@
 import { BadRequestException, Body, Controller, Get, Logger, Post, Req, Res } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { InjectOidcProvider, InteractionHelper, OidcInteraction, Provider } from 'nest-oidc-provider'
+import { ConsentLabelsService } from '~/consent-labels/consent-labels.service'
 // import { verifyToken } from 'node-2fa'
 
 @Controller('/interaction')
 export class InteractionController {
   private readonly logger = new Logger(InteractionController.name)
 
-  public constructor(@InjectOidcProvider() private readonly provider: Provider) {}
+  public constructor(
+    @InjectOidcProvider() private readonly provider: Provider,
+    private readonly consentLabels: ConsentLabelsService,
+  ) {}
 
   @Get(':uid')
   public async interaction(
@@ -45,21 +49,43 @@ export class InteractionController {
           })
         }
         case 'consent': {
-          const msgMap = new Map([
-            ['openid', 'Your account identifier'],
-            ['offline_access', 'Keep connected to your account'],
-            ['profile', 'Your profile information (name, email, phone, ...)'],
-            ['email', 'Your email address'],
-            ['phone', 'Your phone number'],
-            ['address', 'Your address information'],
-          ])
+          const d = prompt.details as {
+            missingOIDCScope?: string[] | string
+            missingOIDCClaims?: string[] | string
+            missingResourceScopes?: Record<string, string[] | string>
+          }
+
+          const asScopeList = (v: string[] | string | undefined): string[] => {
+            if (!v) return []
+            if (Array.isArray(v)) return v.filter(Boolean)
+            return String(v).trim().split(/\s+/).filter(Boolean)
+          }
+
+          const consentScopes = asScopeList(d?.missingOIDCScope).map((scope) => ({
+            scope,
+            description: this.consentLabels.getScopeDescription(scope),
+          }))
+          const consentClaims = asScopeList(d?.missingOIDCClaims as string | string[] | undefined).map((claim) => ({
+            claim,
+            description: this.consentLabels.getClaimDescription(claim),
+          }))
+          const consentResourceScopes =
+            d?.missingResourceScopes && typeof d.missingResourceScopes === 'object'
+              ? Object.entries(d.missingResourceScopes).map(([resource, scopes]) => ({
+                  resource,
+                  scopes: asScopeList(scopes as string | string[]),
+                }))
+              : []
+
           return res.render('pages/consent', {
             client,
             uid,
             params,
             details: prompt.details,
             session,
-            msgMap,
+            consentScopes,
+            consentClaims,
+            consentResourceScopes,
           })
         }
 
@@ -68,8 +94,15 @@ export class InteractionController {
         }
       }
     } catch (e: any) {
-      console.log('prompt', e)
-      res.status(400).header('refresh', '5;url=/').send(e.message)
+      const rawMessage = e?.response?.message ?? e?.message ?? 'Une erreur est survenue'
+      const errorDescription = Array.isArray(rawMessage) ? rawMessage.join(', ') : String(rawMessage)
+      this.logger.warn(`Interaction error: ${errorDescription}`)
+      res.status(400).render('pages/error', {
+        error: {
+          error: 'invalid_request',
+          error_description: errorDescription,
+        },
+      })
     }
   }
 
@@ -80,16 +113,21 @@ export class InteractionController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<any> {
-    const { prompt, params, uid, session, lastSubmission } = await interaction.details()
-    console.log('lastSubmission2', lastSubmission)
-
-    if (prompt.name !== 'login') {
-      throw new BadRequestException('invalid prompt name')
-    }
-
-    // if (lastSubmission) form = { ...lastSubmission.form || {}, ...form }
-
     try {
+      const { prompt, params, uid, session, lastSubmission } = await interaction.details()
+      console.log('lastSubmission2', lastSubmission)
+
+      // if (lastSubmission) form = { ...lastSubmission.form || {}, ...form }
+
+      if (prompt.name !== 'login') {
+        return res.status(400).render('pages/error', {
+          error: {
+            error: 'invalid_request',
+            error_description: 'Invalid prompt name',
+          },
+        })
+      }
+
       // console.log('Login form', form)
       this.logger.debug(`Login UID: ${uid}`)
       this.logger.debug(`Login user: ${form.username}`)
@@ -143,22 +181,51 @@ export class InteractionController {
         },
       )
     } catch (e: any) {
-      const client = await this.provider.Client.find((params as any).client_id)
-      console.log('Login error', e)
-      console.error(e)
+      const rawMessage = e?.response?.message ?? e?.message ?? 'Une erreur est survenue'
+      const errorMessage = Array.isArray(rawMessage) ? rawMessage.join(', ') : String(rawMessage)
+      this.logger.warn(`Login error: ${errorMessage}`)
+
+      // Session OIDC invalide/expiree: afficher directement la page d'erreur.
+      if (errorMessage === 'invalid_request') {
+        return res.status(400).render('pages/error', {
+          error: {
+            error: 'invalid_request',
+            error_description: errorMessage,
+          },
+        })
+      }
+
+      // Cas credentials invalides: on tente de rerendre le formulaire login.
+      let details: Awaited<ReturnType<InteractionHelper['details']>> | null = null
+      try {
+        details = await interaction.details()
+      } catch {
+        return res.status(400).render('pages/error', {
+          error: {
+            error: 'invalid_request',
+            error_description: errorMessage,
+          },
+        })
+      }
+
+      const client = await this.provider.Client.find((details.params as any).client_id)
+
       res.status(400).render('pages/login', {
-        errorMessage: e.message,
-        params,
-        uid,
+        errorMessage,
+        form,
+        params: details.params,
+        uid: details.uid,
         client,
-        details: prompt.details,
-        session,
+        details: details.prompt.details,
+        session: details.session,
       })
     }
   }
 
   @Post(':uid/confirm')
-  public async confirm(@OidcInteraction() interaction: InteractionHelper, @Res() res: Response): Promise<void> {
+  public async confirm(
+    @OidcInteraction() interaction: InteractionHelper,
+  ): Promise<void> {
     const interactionDetails = await interaction.details()
     const {
       prompt: { name, details },
@@ -197,7 +264,35 @@ export class InteractionController {
   }
 
   @Get(':uid/abort')
-  public async abortLogin(@OidcInteraction() interaction: InteractionHelper) {
+  public async abortLoginPage(
+    @OidcInteraction() interaction: InteractionHelper,
+  ): Promise<void> {
+    try {
+      const { uid, prompt, params, session, grantId, lastSubmission } = await interaction.details()
+      this.logger.debug(
+        `Abort interaction: uid=${uid}, prompt=${prompt.name}, client=${String((params as any).client_id ?? '')}, account=${String(session?.accountId ?? '')}, grant=${String(grantId ?? '')}, hasLastSubmission=${Boolean(lastSubmission)}`
+      )
+    } catch (e: any) {
+      this.logger.warn(`Unable to log abort interaction details: ${e?.message ?? 'unknown error'}`)
+    }
+
+    // Ne pas appeler Session.destroy() ici : après `interaction.result`, le navigateur suit
+    // l’URL de reprise (`resume`) qui exige que `session.uid` corresponde au snapshot dans
+    // l’interaction (voir oidc-provider `actions/authorization/resume.js`). Sinon :
+    // « interaction session and authentication session mismatch ».
+    // Pour une déconnexion complète du fournisseur OIDC, utiliser le flux RP-Initiated Logout
+    // (`/oidc/session/end`…).
+    await interaction.finished(
+      {
+        error: 'access_denied',
+        error_description: 'End-user aborted interaction',
+      },
+      { mergeWithLastSubmission: false },
+    )
+  }
+
+  @Get(':uid/abort/complete')
+  public async abortLogin(@OidcInteraction() interaction: InteractionHelper): Promise<void> {
     await interaction.finished(
       {
         error: 'access_denied',

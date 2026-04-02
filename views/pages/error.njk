@@ -1,0 +1,112 @@
+{% extends "layouts/main.njk" %}
+
+{% block content %}
+<div class="w-full max-w-lg overflow-hidden rounded-[1.75rem] error-shell">
+  <div class="p-8 sm:p-10">
+
+    <div class="flex items-center gap-3">
+      <div class="flex items-center justify-center w-11 h-11 rounded-2xl bg-red-500/20 border border-red-500/30 shrink-0">
+        <iconify-icon icon="carbon:error-outline" class="w-5 h-5 text-red-400" aria-hidden="true"></iconify-icon>
+      </div>
+      <div>
+        <h1 class="text-xl font-semibold text-red-300 leading-tight">Une erreur est survenue</h1>
+        <p class="text-[13px] text-red-400/70 mt-0.5">La requête n'a pas pu être traitée.</p>
+      </div>
+    </div>
+
+    <div class="mt-6 rounded-2xl border border-red-500/20 bg-red-500/10 divide-y divide-red-500/10">
+      {% if error.error or error.error_description %}
+        {% if error.error %}
+        <div class="px-5 py-3.5 flex items-start gap-3">
+          <span class="text-[11px] font-medium text-red-400/60 uppercase tracking-widest mt-0.5 w-28 shrink-0">Code</span>
+          <span class="text-[14px] text-red-200 font-mono break-all">{{ error.error }}</span>
+        </div>
+        {% endif %}
+        {% if error.error_description %}
+        <div class="px-5 py-3.5 flex items-start gap-3">
+          <span class="text-[11px] font-medium text-red-400/60 uppercase tracking-widest mt-0.5 w-28 shrink-0">Description</span>
+          <span class="text-[14px] text-red-200 break-words">{{ error.error_description }}</span>
+        </div>
+        {% endif %}
+      {% elif error.message %}
+        <div class="px-5 py-3.5 flex items-start gap-3">
+          <span class="text-[11px] font-medium text-red-400/60 uppercase tracking-widest mt-0.5 w-28 shrink-0">Message</span>
+          <span class="text-[14px] text-red-200 break-words">{{ error.message }}</span>
+        </div>
+      {% else %}
+        <div class="px-5 py-3.5">
+          <span class="text-[14px] text-red-300">Erreur inconnue.</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <p class="mt-5 text-[12px] text-red-400/50 leading-relaxed">
+      Si le problème persiste, contactez l'administrateur du service.
+    </p>
+
+    <div class="mt-6 flex flex-col sm:flex-row gap-3">
+      <button
+        type="button"
+        id="back-button"
+        class="inline-flex items-center justify-center rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-200 transition hover:bg-red-500/20"
+      >
+        Retour arriere
+      </button>
+      <a
+        href="/"
+        class="inline-flex items-center justify-center rounded-xl border border-red-400/20 px-4 py-2 text-sm text-red-300/90 transition hover:bg-red-500/10"
+      >
+        Aller a l'accueil
+      </a>
+    </div>
+
+    <p class="mt-3 text-[12px] text-red-400/60">
+      Redirection automatique dans <span id="redirect-countdown">10</span> secondes...
+    </p>
+  </div>
+</div>
+
+<style>
+  .error-shell {
+    background: rgba(40, 10, 10, 0.78);
+    -webkit-backdrop-filter: saturate(180%) blur(40px);
+    backdrop-filter: saturate(180%) blur(40px);
+    border: 1px solid rgba(239, 68, 68, 0.22);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(239, 68, 68, 0.12) inset, 0 0 60px rgba(220, 38, 38, 0.08);
+  }
+</style>
+
+<script>
+  (function () {
+    const fallbackUrl = '/'
+    const countdownElement = document.getElementById('redirect-countdown')
+    const backButton = document.getElementById('back-button')
+    const canGoBack = window.history.length > 1
+    let remainingSeconds = 10
+
+    const redirect = () => {
+      if (canGoBack) {
+        window.history.back()
+        return
+      }
+      window.location.assign(fallbackUrl)
+    }
+
+    if (backButton) {
+      backButton.addEventListener('click', redirect)
+    }
+
+    const interval = window.setInterval(function () {
+      remainingSeconds -= 1
+      if (countdownElement) {
+        countdownElement.textContent = String(Math.max(remainingSeconds, 0))
+      }
+
+      if (remainingSeconds <= 0) {
+        window.clearInterval(interval)
+        redirect()
+      }
+    }, 1000)
+  })()
+</script>
+{% endblock %}

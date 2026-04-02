@@ -1,18 +1,110 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="synthwave">
+<html lang="fr">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   {% include "partials/assets/head.njk" %}
+  <style>
+    :root {
+      --twitch: #9146ff;
+      --twitch-hover: #772ce8;
+      --twitch-glow: rgba(145, 70, 255, 0.45);
+      --glass-edge: rgba(255, 255, 255, 0.12);
+      --glass-inset: rgba(255, 255, 255, 0.06);
+      --glass-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+    }
+    /* Iconify: éviter un "0px" avant le chargement du web component */
+    iconify-icon {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      vertical-align: middle;
+    }
+    html {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+    }
+    .glass-shell {
+      background: rgba(18, 16, 28, 0.72);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
+      backdrop-filter: saturate(180%) blur(40px);
+      border: 1px solid var(--glass-edge);
+      box-shadow: var(--glass-shadow);
+    }
+    .glass-tint {
+      background: linear-gradient(160deg, rgba(145, 70, 255, 0.12) 0%, rgba(18, 16, 28, 0.35) 50%, rgba(10, 8, 18, 0.5) 100%);
+      -webkit-backdrop-filter: saturate(160%) blur(28px);
+      backdrop-filter: saturate(160%) blur(28px);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .glass-inner {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .glass-field {
+      background: rgba(255, 255, 255, 0.06);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 1px 0 var(--glass-inset) inset;
+      color: rgba(250, 250, 250, 0.95);
+    }
+    .glass-field::placeholder {
+      color: rgba(161, 161, 170, 0.7);
+    }
+    .glass-field:focus {
+      outline: none;
+      border-color: rgba(145, 70, 255, 0.55);
+      box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.2), 0 1px 0 var(--glass-inset) inset;
+    }
+    .btn-primary {
+      background: var(--twitch);
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      border: none;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 4px 20px var(--twitch-glow);
+    }
+    .btn-primary:hover {
+      background: var(--twitch-hover);
+    }
+    .btn-primary:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.45), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+    }
+    .btn-glass {
+      background: rgba(255, 255, 255, 0.08);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: rgba(228, 228, 231, 0.95);
+      font-weight: 500;
+    }
+    .btn-glass:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .link-accent {
+      color: #c4a6ff;
+    }
+    .link-accent:hover {
+      color: #e0d4ff;
+    }
+  </style>
+  {% block head_extra %}{% endblock %}
 </head>
 
-<body>
-  <div class="min-h-screen bg-base-200 flex items-center p-5" style="background-image: url('/static/img/5172658.jpg')">
-    <div class="card mx-auto w-full max-w-5xl shadow-md">
+<body class="antialiased {% if fullWidth %}bg-[#06060e] text-[#e8e4ff] min-h-screen overflow-x-hidden relative{% else %}text-zinc-100{% endif %}">
+  {% if not fullWidth %}
+  <div
+    class="relative min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-zinc-950 bg-cover bg-center bg-no-repeat"
+    style="background-image: url('/background.svg')">
+    <div class="absolute inset-0 bg-zinc-950/80" aria-hidden="true"></div>
+    <div class="relative z-10 w-full flex justify-center">
+  {% endif %}
       {% block content %}{% endblock %}
+  {% if not fullWidth %}
     </div>
   </div>
+  {% endif %}
   {% include "partials/assets/scripts.njk" %}
 </body>
 </html>

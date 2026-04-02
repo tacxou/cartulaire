@@ -4,7 +4,23 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "assets": [],
+    "assets": [
+      {
+        "include": "../views/**/*.njk",
+        "outDir": "dist/views",
+        "watchAssets": true
+      },
+      {
+        "include": "../static/**/*",
+        "outDir": "dist/static",
+        "watchAssets": true
+      },
+      {
+        "include": "../config/**/*.yml",
+        "outDir": "dist/config",
+        "watchAssets": true
+      }
+    ],
     "builder": "swc",
     "typeCheck": false,
     "watchAssets": true

@@ -11,7 +11,7 @@ export function issueRefreshToken(
   client: Client,
   code: AuthorizationCode | DeviceCode | BackchannelAuthenticationRequest,
 ) {
-  console.log('issueRefreshToken', client, code)
+  // console.log('issueRefreshToken', client, code)
   return (
     client.grantTypeAllowed('refresh_token') &&
     (code.scopes.has('offline_access') || code.scopes.has('openid') || code.scopes.has('token'))

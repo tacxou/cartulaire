@@ -40,6 +40,7 @@
     "@tacxou/nestjs_module_restools": "^0.1.0",
     "body-parser": "^2.2.2",
     "chalk": "^5.6.2",
+    "chokidar": "^5.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "helmet": "^8.1.0",
@@ -54,7 +55,8 @@
     "rxjs": "^7.8.2",
     "swagger-themes": "^1.4.3",
     "tsx": "^4.21.0",
-    "types-package-json": "^2.0.39"
+    "types-package-json": "^2.0.39",
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.16",
@@ -63,6 +65,7 @@
     "@swc/core": "^1.15.11",
     "@types/bun": "latest",
     "@types/express": "^5.0.6",
+    "@types/nunjucks": "^3.2.6",
     "@types/oidc-provider": "^9.5.0",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
     "@typescript-eslint/parser": "^8.54.0",

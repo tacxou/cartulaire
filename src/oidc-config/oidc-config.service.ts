@@ -1,28 +1,28 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { HttpAdapterHost } from '@nestjs/core'
 import { OidcConfiguration, OidcModuleOptions, OidcModuleOptionsFactory } from 'nest-oidc-provider'
+import * as nunjucks from 'nunjucks'
 import {
-  AccessToken,
-  Account,
   AdapterFactory,
-  AuthorizationCode,
-  BackchannelAuthenticationRequest,
-  DeviceCode,
   Interaction,
   JWKS,
-  KoaContextWithOIDC,
-  ResourceServer,
+  KoaContextWithOIDC
 } from 'oidc-provider'
 import { AbstractServiceStorage } from '~/_common/_abstracts/abstract.service.storage'
+import { ClientsService } from '~/clients/clients.service'
+import { JwksService } from '~/jwks/jwks.service'
 import { StorageService } from '~/storage/storage.service'
-import { isPkceRequired } from './_functions/is-pkce-required.function'
-import { findAccount } from './_functions/find-account.function'
-import { issueRefreshToken } from './_functions/issue-refresh-token.function'
 import { introspectionAllowedPolicy } from './_functions/_features/introspection.function'
 import {
   resourceIndicatorsDefaultResource,
   resourceIndicatorsGetResourceServerInfo,
 } from './_functions/_features/resource-indicators.function'
+import { findAccount } from './_functions/find-account.function'
+import { isPkceRequired } from './_functions/is-pkce-required.function'
+import { issueRefreshToken } from './_functions/issue-refresh-token.function'
+import { loadExistingGrant } from './_functions/load-existing-grant.function'
+import { renderError } from './_functions/render-error.function'
 
 @Injectable()
 export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit {
@@ -31,19 +31,22 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
   public constructor(
     private readonly dbService: AbstractServiceStorage,
     private readonly configService: ConfigService,
+    private readonly httpAdapterHost: HttpAdapterHost,
+    private readonly clientsService: ClientsService,
+    private readonly jwksService: JwksService,
   ) {}
 
   public async onModuleInit() {
-    //TODO: parse and validate the configuration yml file
-    this.logger.debug('onModuleInit')
+    this.logger.debug('OIDC configuration initialized ⚒️')
   }
 
-  public createModuleOptions(): OidcModuleOptions | Promise<OidcModuleOptions> {
+  public async createModuleOptions(): Promise<OidcModuleOptions> {
+    const jwks = await this.jwksService.loadOrCreate()
     return {
-      issuer: this.configService.get('oidc.issuer'),
-      oidc: this.getConfiguration(),
+      issuer: this.configService.get<string>('oidc.issuer'),
+      oidc: this.getConfiguration(jwks),
       path: '/oidc',
-      // proxy: true,
+      proxy: true,
     }
   }
 
@@ -52,33 +55,22 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
   }
 
   /**
+   * Get the OIDC configuration
+   *
    * @see https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#configuration-options
    * @returns OidcConfiguration
    */
-  public getConfiguration(): OidcConfiguration {
+  public getConfiguration(jwks: JWKS): OidcConfiguration {
+    const clients = this.clientsService.getClients()
+    this.logger.log(`${clients.length} client(s) chargé(s) depuis ${this.clientsService.filePath} ✅`)
+
+    const renderNunjucks = (template: string, data: Record<string, unknown>): string => {
+      const nunjucksEnv: nunjucks.Environment = this.httpAdapterHost.httpAdapter.getInstance().get('nunjucksEnv')
+      return nunjucksEnv.render(template, data)
+    }
+
     return {
-      clients: [
-        {
-          client_id: 'test',
-          client_secret: 'test',
-          grant_types: [
-            'implicit',
-            // 'client_credentials',
-            'authorization_code',
-            'refresh_token',
-            'urn:ietf:params:oauth:grant-type:device_code',
-          ],
-          token_endpoint_auth_method: 'none',
-          // application_type: 'web',
-          response_types: ['code'],
-          redirect_uris: [
-            'https://oidcdebugger.com/debug',
-            'https://127.0.0.1:3000/login',
-            'https://127.0.0.1:3000/',
-            'https://psteniusubi.github.io/oidc-tester/authorization-code-flow.html',
-          ],
-        },
-      ],
+      clients,
       features: {
         devInteractions: { enabled: false },
         userinfo: { enabled: true },
@@ -87,6 +79,39 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
         clientCredentials: { enabled: true },
         revocation: { enabled: true },
         encryption: { enabled: true },
+
+        /**
+         * UI de déconnexion (RP-Initiated Logout 1.0)
+         * - Affiche une confirmation “logout”
+         * - Et une page de succès sur `/oidc/session/end/success`
+         */
+        rpInitiatedLogout: {
+          enabled: true,
+          logoutSource: async (ctx: KoaContextWithOIDC, formHtml: string) => {
+            // NB: dans oidc-provider, ctx.req/ctx.res sont des objets Node (pas Express)
+            // eslint-disable-next-line no-console
+            console.dir({ req: ctx.req, res: ctx.res }, { depth: 1 })
+            const clientDisplay =
+              ctx?.oidc?.client?.clientName ||
+              ctx?.oidc?.client?.clientId ||
+              ctx?.oidc?.session?.state?.clientId ||
+              null
+
+            ctx.type = 'html'
+            ctx.body = renderNunjucks('pages/logout.njk', {
+              clientDisplay,
+              formHtml,
+            })
+          },
+
+          postLogoutSuccessSource: async (ctx: any) => {
+            const clientDisplay =
+              ctx?.oidc?.client?.clientName || ctx?.oidc?.client?.clientId || null
+
+            ctx.type = 'html'
+            ctx.body = renderNunjucks('pages/logout-success.njk', { clientDisplay })
+          },
+        },
 
         introspection: {
           enabled: true,
@@ -146,6 +171,17 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
         },
       },
 
+      /**
+       * Render the error page using the Nunjucks template engine.
+       *
+       * @see https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#rendererror
+       * @param ctx Koa request context
+       * @param out Output object
+       * @param error Error object
+       * @returns void
+       */
+      renderError: (ctx, out, error) => renderError(ctx, out, error, renderNunjucks),
+
       claims: {
         openid: ['sub'],
         profile: ['name'],
@@ -158,7 +194,7 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
        *
        * @see https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#issuerefreshtoken
        */
-      issueRefreshToken: issueRefreshToken,
+      issueRefreshToken,
 
       /**
        * The `findAccount` function is responsible for retrieving the account information for a given subject (user) and token.
@@ -167,7 +203,7 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
        *
        * @see https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#accounts
        */
-      findAccount: findAccount,
+      findAccount,
 
       /**
        * PKCE (Proof Key for Code Exchange) is a security extension to the Authorization Code flow,
@@ -175,9 +211,51 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
        *
        * @see https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#pkce
        */
+
+      /**
+       * Active tous les response_types définis dans les specs OIDC Core 1.0 et OAuth 2.0
+       * Multiple Response Type Encoding Practices. Par défaut en v9, oidc-provider exclut
+       * les types retournant un access token depuis l'authorization endpoint (RFC 9700).
+       * On les réautorise explicitement ici pour supporter le flow implicit.
+       *
+       * @see https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#responsetypes
+       */
+      responseTypes: [
+        'code',
+        'id_token',
+        'code id_token',
+        'code token',
+        'id_token token',
+        'code id_token token',
+        'none',
+      ],
+
       pkce: {
         required: isPkceRequired,
       },
+
+      /**
+       * Déclare `skip_consent` comme métadonnée client personnalisée reconnue par le provider.
+       *
+       * @see https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#extraclientmetadata
+       */
+      extraClientMetadata: {
+        properties: ['skip_consent'],
+        validator(_ctx, key, value) {
+          if (key === 'skip_consent' && value !== undefined && typeof value !== 'boolean') {
+            throw new Error('skip_consent doit être un booléen')
+          }
+        },
+      },
+
+      /**
+       * Contourne la page de consentement pour les clients ayant `skip_consent: true`.
+       * Un grant est créé automatiquement (ou rechargé s'il existe déjà) avec tous les scopes demandés.
+       * Pour les autres clients, recharge le grant existant depuis la session (comportement par défaut).
+       *
+       * @see https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#loadexistinggrant
+       */
+      loadExistingGrant,
 
       /**
        * Interaction URL generation depends on the type of interaction.
@@ -188,7 +266,9 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
        */
       interactions: {
         // policy: [],
-        url(_ctx: KoaContextWithOIDC, interaction: Interaction) {
+        url(ctx: KoaContextWithOIDC, interaction: Interaction) {
+          // eslint-disable-next-line no-console
+          console.log('[oidc][interaction.url] client_id=', ctx?.oidc?.params?.client_id)
           return `/interaction/${interaction.uid}`
         },
       },
@@ -200,7 +280,7 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
        *
        * @see https://github.com/panva/node-oidc-provider-example/blob/main/01-oidc-configured/generate-keys.js
        */
-      jwks: this.configService.get<JWKS>('oidc.jwks', undefined),
+      jwks,
 
       /**
        * Load additional configuration from environment variables or configuration files

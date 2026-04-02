@@ -3,9 +3,7 @@ import Joi from 'joi'
 import { getLogLevel } from './_common/_functions/get-log-level'
 import { SwaggerCustomOptions } from '@nestjs/swagger'
 import { OidcConfiguration } from 'nest-oidc-provider'
-import { existsSync } from 'fs'
-import { exportJWK, generateKeyPair } from 'jose'
-import { readFile, writeFile } from 'fs/promises'
+import { join } from 'node:path'
 
 export const validationSchema = Joi.object({
   CARTULAIRE_LOG_LEVEL: Joi.string().valid('fatal', 'error', 'warn', 'info', 'debug', 'verbose').default('debug'),
@@ -14,13 +12,13 @@ export const validationSchema = Joi.object({
 
   CARTULAIRE_OIDC_ISSUER: Joi.string().uri().default('http://localhost:9000'),
 
-  CARTULAIRE_OIDC_COOKIE_KEYS: Joi.string().custom((value, helpers) => {
-    const keys = value.split(',')
-    if (keys.length === 0) {
-      return helpers.error('any.invalid')
-    }
-    return keys
-  }),
+  CARTULAIRE_OIDC_HOST: Joi.string().hostname().default('localhost'),
+
+  CARTULAIRE_OIDC_PORT: Joi.number().port().default(9000),
+
+  CARTULAIRE_OIDC_PROTOCOL: Joi.string().valid('http', 'https').default('http'),
+
+  CARTULAIRE_OIDC_COOKIE_KEYS: Joi.string().min(16).required(),
 })
 
 export interface ConfigInstance {
@@ -32,6 +30,12 @@ export interface ConfigInstance {
 
   oidc: OidcConfiguration & {
     issuer: string
+    host: string
+    port: number
+    protocol: 'http' | 'https'
+    viewsPath: string
+    assetsPath: string
+    isProduction: boolean
   }
 
   swagger: {
@@ -42,19 +46,9 @@ export interface ConfigInstance {
 }
 
 export default async (): Promise<ConfigInstance> => {
-  const jwks = { keys: [] }
-  const keyFile = './keys.json'
-
-  if (!existsSync(keyFile)) {
-    Logger.debug('Key file does not exist, generating new key file')
-    const { privateKey } = await generateKeyPair('RS256', { extractable: true })
-    jwks.keys = [await exportJWK(privateKey)]
-    await writeFile(keyFile, JSON.stringify(jwks))
-    Logger.debug('Key file generated')
-  } else {
-    jwks.keys = JSON.parse(await readFile(keyFile, 'utf8')).keys
-    Logger.debug('Key file already exists, skipping key generation')
-  }
+  const isProduction = process.env.NODE_ENV === 'production'
+  const viewsPath = isProduction ? join(__dirname, 'views') : join(__dirname, '..', 'views')
+  const assetsPath = isProduction ? join(__dirname, 'static') : join(__dirname, '..', 'static')
 
   return {
     application: {
@@ -67,9 +61,13 @@ export default async (): Promise<ConfigInstance> => {
     },
 
     oidc: {
-      jwks,
       issuer: process.env['CARTULAIRE_OIDC_ISSUER'],
-      // clients: [],
+      host: process.env['CARTULAIRE_OIDC_HOST'],
+      port: parseInt(process.env['CARTULAIRE_OIDC_PORT']!),
+      protocol: process.env['CARTULAIRE_OIDC_PROTOCOL'] as 'http' | 'https',
+      isProduction,
+      viewsPath,
+      assetsPath,
       ttl: {
         AccessToken: 3600,
         AuthorizationCode: 600,
@@ -78,7 +76,7 @@ export default async (): Promise<ConfigInstance> => {
         RefreshToken: 1209600,
       },
       cookies: {
-        keys: process.env['CARTULAIRE_OIDC_COOKIE_KEYS'],
+        keys: process.env['CARTULAIRE_OIDC_COOKIE_KEYS'].split(',').map((key) => Buffer.from(key, 'base64')),
       },
     },
 

@@ -4,11 +4,15 @@ import { RedisModule } from '@nestjs-modules/ioredis'
 import { RedisOptions } from 'ioredis'
 import { OidcConfigService } from './oidc-config.service'
 import { StorageModule } from '~/storage/storage.module'
+import { ClientsModule } from '~/clients/clients.module'
+import { JwksModule } from '~/jwks/jwks.module'
 
 const redisEnabled = process.env['CARTULAIRE_STORAGE_ADAPTER'] === 'redis'
 
 @Module({
   imports: [
+    ClientsModule,
+    JwksModule,
     StorageModule.registerAsync({
       imports: [
         ConfigModule,

@@ -1,0 +1,36 @@
+{% extends "layouts/main.njk" %}
+
+{% block content %}
+<div class="w-full max-w-md rounded-[1.75rem] glass-shell">
+  <div class="p-8">
+    <h1 class="text-xl font-semibold text-zinc-50">Annulation en cours</h1>
+    <p class="mt-3 text-zinc-400 leading-relaxed">
+      Refus de la demande et déconnexion en cours...
+    </p>
+    <p class="mt-4 text-[12px] text-zinc-500">
+      Veuillez patienter quelques secondes.
+    </p>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const abortCompleteUrl = '/interaction/{{ uid }}/abort/complete'
+    const logoutUrl = '/oidc/session/end'
+
+    window
+      .fetch(abortCompleteUrl, {
+        method: 'GET',
+        credentials: 'include',
+        redirect: 'follow',
+        keepalive: true,
+      })
+      .catch(function () {
+        // En cas d'echec front, on tente quand meme la deconnexion.
+      })
+      .finally(function () {
+       // window.location.assign(logoutUrl)
+      })
+  })()
+</script>
+{% endblock %}

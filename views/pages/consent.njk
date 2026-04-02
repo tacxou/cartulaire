@@ -1,57 +1,118 @@
 {% extends "layouts/main.njk" %}
 
 {% block content %}
-<div class="grid  md:grid-cols-2 grid-cols-1  bg-base-100/[.9] rounded-xl">
-  <div>
-    <div class="hero min-h-full rounded-l-xl bg-base-200/[.9]">
-      <div class="hero-content py-12">
-        <div class="max-w-md">
-
-          <h1 class='text-3xl text-center font-bold '><img
-              src="https://tailwind-dashboard-template-dashwind.vercel.app/logo192.png"
-              class="w-12 inline-block mr-2 mask mask-circle" alt="dashwind-logo" />DashWind</h1>
-
-          <div class="text-center mt-12"><img src="https://tailwind-dashboard-template-dashwind.vercel.app/intro.png"
-              alt="Dashwind Admin Template" class="w-48 inline-block"></img></div>
-
-          <h1 class="text-2xl mt-8 font-bold">Admin Dashboard Starter Kit</h1>
-          <p class="py-2 mt-4">✓ <span class="font-semibold">Light/dark</span> mode toggle</p>
-          <p class="py-2 ">✓ <span class="font-semibold">Redux toolkit</span> and other utility libraries
-            configured</p>
-          <p class="py-2">✓ <span class="font-semibold">Calendar, Modal, Sidebar </span> components</p>
-          <p class="py-2  ">✓ User-friendly <span class="font-semibold">documentation</span></p>
-          <p class="py-2  mb-4">✓ <span class="font-semibold">Daisy UI</span> components, <span
-              class="font-semibold">Tailwind CSS</span> support</p>
-
-        </div>
-
+<div class="w-full max-w-4xl overflow-hidden rounded-[1.75rem] glass-shell">
+  <div class="grid md:grid-cols-2">
+    <div class="hidden md:flex flex-col justify-center p-10 lg:p-12 glass-tint min-h-[28rem]">
+      <div class="max-w-sm mx-auto text-center">
+        <img src="/logo.png" width="96" height="96" alt="Cartulaire"
+          class="w-20 h-20 mx-auto object-contain select-none" />
+        <h1 class="mt-6 text-xl font-semibold text-zinc-50 tracking-tight">Demande d’accès</h1>
+        <p class="mt-3 text-[14px] leading-relaxed text-zinc-400">
+          Une application souhaite accéder à des données de votre compte Cartulaire. Vérifiez chaque autorisation avant d’accepter.
+        </p>
+        <p class="mt-6 text-[12px] text-zinc-500 leading-relaxed border-t border-white/10 pt-6">
+          Vous pouvez refuser ; l’application ne pourra pas utiliser les droits non accordés.
+        </p>
       </div>
     </div>
+
+    <div class="p-8 sm:p-10 lg:p-12 glass-inner backdrop-blur-sm">
+      <div class="text-center md:text-left">
+        <h2 class="text-2xl font-semibold text-zinc-50 tracking-tight">Autoriser l’application</h2>
+        <p class="mt-1.5 text-[15px] text-zinc-500">Récapitulatif des accès demandés</p>
+      </div>
+
+      <form action="/interaction/{{ uid }}/confirm" method="POST" autocomplete="off" class="mt-8 space-y-6">
+        {# Carte application #}
+        <div class="rounded-2xl glass-field px-5 py-4">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Application</p>
+          <p class="mt-1 text-lg font-semibold text-zinc-100 truncate" title="{{ client.clientName or client.clientId or params.client_id }}">
+            {{ client.clientName or client.clientId or params.client_id }}
+          </p>
+          {% if client.clientId and client.clientName %}
+          <p class="mt-0.5 text-[13px] text-zinc-500 font-mono truncate">{{ client.clientId }}</p>
+          {% endif %}
+        </div>
+
+        {% if (consentScopes | default([]) | length) > 0 %}
+        <div>
+          <h3 class="text-[13px] font-semibold text-zinc-300 uppercase tracking-wide mb-3">Périmètres OpenID / OAuth</h3>
+          <ul class="space-y-2.5" role="list">
+            {% for item in consentScopes %}
+            <li
+              class="rounded-2xl border border-white/[0.10] bg-white/[0.04] px-4 py-3.5 flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-4">
+              <span
+                class="inline-flex shrink-0 self-start items-center rounded-lg bg-[#9146ff]/20 text-[#d4bcff] border border-[#9146ff]/35 px-2.5 py-1 text-[11px] font-semibold font-mono tracking-tight">{{ item.scope }}</span>
+              <p class="text-[14px] leading-snug text-zinc-400">
+                {% if item.description %}{{ item.description }}{% else %}Accès au périmètre «&nbsp;<span class="text-zinc-300">{{ item.scope }}</span>&nbsp;».{% endif %}
+              </p>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {% if (consentClaims | default([]) | length) > 0 %}
+        <div>
+          <h3 class="text-[13px] font-semibold text-zinc-300 uppercase tracking-wide mb-3">Claims OpenID demandées</h3>
+          <ul class="space-y-2.5" role="list">
+            {% for item in consentClaims %}
+            <li
+              class="rounded-2xl border border-white/[0.10] bg-white/[0.04] px-4 py-3.5 flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-4">
+              <span
+                class="inline-flex shrink-0 self-start items-center rounded-lg bg-zinc-500/20 text-zinc-200 border border-zinc-400/25 px-2.5 py-1 text-[11px] font-semibold font-mono tracking-tight">{{ item.claim }}</span>
+              <p class="text-[14px] leading-snug text-zinc-400">
+                {% if item.description %}{{ item.description }}{% else %}Publication de la revendication «&nbsp;<span class="text-zinc-300">{{ item.claim }}</span>&nbsp;» dans l’ID token / userinfo.{% endif %}
+              </p>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {% if (consentResourceScopes | default([]) | length) > 0 %}
+        <div>
+          <h3 class="text-[13px] font-semibold text-zinc-300 uppercase tracking-wide mb-3">Ressources (RFC 8707)</h3>
+          <div class="space-y-4">
+            {% for block in consentResourceScopes %}
+            <div class="rounded-2xl border border-white/[0.10] bg-white/[0.04] p-4">
+              <p class="text-[11px] text-zinc-500 font-mono break-all leading-relaxed">{{ block.resource }}</p>
+              {% if block.scopes and block.scopes.length %}
+              <div class="mt-3 flex flex-wrap gap-2">
+                {% for s in block.scopes %}
+                <span
+                  class="inline-flex items-center rounded-lg bg-[#9146ff]/15 text-[#c9b3ff] border border-[#9146ff]/30 px-2.5 py-1 text-[11px] font-mono">{{ s }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if (consentScopes | default([]) | length) == 0
+          and (consentClaims | default([]) | length) == 0
+          and (consentResourceScopes | default([]) | length) == 0 %}
+        <div class="rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-5 py-8 text-center">
+          <p class="text-[14px] text-zinc-400">Aucune nouvelle autorisation listée. Vous pouvez continuer ou annuler.</p>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
+          <a
+            href="/interaction/{{ uid }}/abort"
+            class="btn-glass inline-flex w-full min-h-[52px] justify-center items-center text-center rounded-full px-5 py-3 text-[13px] sm:text-[14px] leading-tight transition order-2 sm:order-1 active:scale-[0.99]">
+            <span>Refuser et se déconnecter</span>
+          </a>
+          <button type="submit"
+            class="btn-primary inline-flex w-full min-h-[52px] justify-center items-center text-center rounded-full px-5 py-3 text-[14px] leading-tight transition order-1 sm:order-2 active:scale-[0.99]">
+            Autoriser et continuer
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
-  <div class="py-24 px-10">
-    <h2 class="text-2xl font-semibold mb-2 text-center">Consent</h2>
-    <form action="/interaction/{{ uid }}/confirm" method="POST" autocomplete="off">
-
-      <div class="mb-4">
-        <pre>{{ details | dump }}</pre>
-      </div>
-
-      <div class='text-right text-primary'>
-        <a href="/forgot-password"><span
-          class="text-sm inline-block hover:text-primary hover:underline hover:cursor-pointer transition duration-200">Forgot
-          Password?</span></a>
-      </div>
-
-      <div class="grid grid-cols-3 grid-flow-col gap-4">
-        <a href="/interaction/{{ uid }}/abort" class="btn mt-2 w-full btn-primary btn-link">Continuer</a>
-        <button type="submit" class="btn mt-2 w-full btn-primary col-span-2">Continuer</button>
-      </div>
-
-      <div class='text-center mt-4'>Don't have an account yet?
-        <a href="/register"><span
-            class="inline-block hover:text-primary hover:underline hover:cursor-pointer transition duration-200">Register</span>
-        </a>
-      </div>
-    </form>
-  </div>
+</div>
 {% endblock %}

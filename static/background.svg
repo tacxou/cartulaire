@@ -1,0 +1,60 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" class="auth-network-bg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M60 0 L0 0 0 60" fill="none" stroke="#1e293b" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#bg)" />
+  <rect width="100%" height="100%" fill="url(#grid)" opacity="0.4"/>
+
+  <!-- Vertical lines -->
+  <g stroke="#38bdf8" stroke-width="1.5" opacity="0.15">
+    <line x1="200" y1="0" x2="200" y2="800"/>
+    <line x1="400" y1="0" x2="400" y2="800"/>
+    <line x1="600" y1="0" x2="600" y2="800"/>
+    <line x1="800" y1="0" x2="800" y2="800"/>
+    <line x1="1000" y1="0" x2="1000" y2="800"/>
+  </g>
+
+  <!-- Horizontal lines -->
+  <g stroke="#22d3ee" stroke-width="1.5" opacity="0.15">
+    <line x1="0" y1="150" x2="1200" y2="150"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/>
+    <line x1="0" y1="450" x2="1200" y2="450"/>
+    <line x1="0" y1="600" x2="1200" y2="600"/>
+  </g>
+
+  <!-- Nodes -->
+  <g fill="#38bdf8">
+    <circle cx="200" cy="150" r="3"/>
+    <circle cx="400" cy="300" r="3"/>
+    <circle cx="600" cy="450" r="3"/>
+    <circle cx="800" cy="300" r="3"/>
+    <circle cx="1000" cy="600" r="3"/>
+  </g>
+
+  <!-- Data flow animation -->
+  <g stroke="#67e8f9" stroke-width="2" stroke-linecap="round">
+    <line x1="200" y1="150" x2="200" y2="150">
+      <animate attributeName="y2" values="150;800" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="4s" repeatCount="indefinite"/>
+    </line>
+
+    <line x1="400" y1="300" x2="400" y2="300">
+      <animate attributeName="y2" values="300;0" dur="5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="5s" repeatCount="indefinite"/>
+    </line>
+
+    <line x1="0" y1="450" x2="0" y2="450">
+      <animate attributeName="x2" values="0;1200" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="6s" repeatCount="indefinite"/>
+    </line>
+  </g>
+</svg>
