@@ -18,7 +18,7 @@
     "@cartulaire/crypto": "*",
     "@cartulaire/logger": "*",
     "@nestjs/common": "^10.3.10",
-    "@nestjs/core": "^10.3.10",
+    "@nestjs/core": "^11.1.18",
     "@nestjs/platform-express": "^10.3.10",
     "chalk": "^5.6.2",
     "joi": "^18.0.2",
