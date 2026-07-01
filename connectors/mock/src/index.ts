@@ -1,5 +1,7 @@
 import {
+  authDisableMfaPayloadSchema,
   authGetMfaMethodsPayloadSchema,
+  authRegisterMfaPayloadSchema,
   authStartMfaPayloadSchema,
   authVerifyMfaPayloadSchema,
   authVerifyPasswordPayloadSchema,
@@ -14,7 +16,7 @@ import {
 } from '@cartulaire/connector-contracts'
 import { CommandFailure, createConnectorServer, defineCommand } from '@cartulaire/connector-sdk'
 import { findByIdentifier, findBySub, mapClaims } from './users'
-import { getMfaMethods, outbox, startMfa, verifyMfa } from './mfa'
+import { disableMfa, getMfaMethods, outbox, registerConfirm, registerStart, startMfa, verifyMfa } from './mfa'
 
 /**
  * Store de consentement en mémoire — clé `${subject}::${clientId}` → scopes.
@@ -37,6 +39,8 @@ const PERMISSIONS = [
   COMMANDS.AUTH_GET_MFA_METHODS,
   COMMANDS.AUTH_START_MFA,
   COMMANDS.AUTH_VERIFY_MFA,
+  COMMANDS.AUTH_REGISTER_MFA,
+  COMMANDS.AUTH_DISABLE_MFA,
   COMMANDS.CLAIMS_MAP,
   COMMANDS.CONSENT_GET,
   COMMANDS.CONSENT_SAVE,
@@ -95,6 +99,21 @@ const commands = [
       throw new CommandFailure(ERROR_CODES.MFA_INVALID, 'invalid mfa response', 'Code invalide.')
     }
     return { valid: true }
+  }),
+
+  defineCommand(COMMANDS.AUTH_REGISTER_MFA, (payload) => {
+    const p = authRegisterMfaPayloadSchema.parse(payload)
+    if (p.phase === 'start') return registerStart(p.subject, p.type, p.label)
+    const res = registerConfirm(p.subject, p.challengeId ?? '', p.code)
+    if (!res.registered) {
+      throw new CommandFailure(ERROR_CODES.MFA_INVALID, 'enrollment failed', 'Code invalide.')
+    }
+    return res
+  }),
+
+  defineCommand(COMMANDS.AUTH_DISABLE_MFA, (payload) => {
+    const { subject, methodId } = authDisableMfaPayloadSchema.parse(payload)
+    return { disabled: disableMfa(subject, methodId) }
   }),
 
   defineCommand(COMMANDS.CLAIMS_MAP, (payload) => {

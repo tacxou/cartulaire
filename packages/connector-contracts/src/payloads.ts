@@ -83,6 +83,40 @@ export const authVerifyMfaResultSchema = z.object({
   valid: z.boolean(),
 })
 
+// auth.registerMfa — enrôlement d'un facteur, en deux phases (§14.2, §23)
+export const authRegisterMfaPayloadSchema = z.object({
+  subject: z.string().min(1),
+  type: z.enum(MFA_METHOD_TYPES),
+  /** `start` initie l'enrôlement ; `confirm` le valide avec un code/réponse. */
+  phase: z.enum(['start', 'confirm']),
+  /** Libellé/destination pour start (email, n° masqué, nom de clé…). */
+  label: z.string().optional(),
+  challengeId: z.string().optional(),
+  code: z.string().optional(),
+  response: z.record(z.unknown()).optional(),
+})
+export const authRegisterMfaResultSchema = z.object({
+  challengeId: z.string().optional(),
+  /** Secret TOTP (base32) + URI otpauth à présenter/scanner, phase start. */
+  secret: z.string().optional(),
+  otpauthUri: z.string().optional(),
+  hint: z.string().optional(),
+  /** Données spécifiques (options de création WebAuthn…). */
+  data: z.record(z.unknown()).optional(),
+  /** Phase confirm : facteur enrôlé. */
+  registered: z.boolean().optional(),
+  methodId: z.string().optional(),
+})
+
+// auth.disableMfa — retire un facteur enrôlé
+export const authDisableMfaPayloadSchema = z.object({
+  subject: z.string().min(1),
+  methodId: z.string().min(1),
+})
+export const authDisableMfaResultSchema = z.object({
+  disabled: z.boolean(),
+})
+
 // claims.map — projette un sujet + scopes vers des claims OIDC (§16.4)
 export const claimsMapPayloadSchema = z.object({
   subject: z.string().min(1),
@@ -135,6 +169,8 @@ export type ClaimsMapResult = z.infer<typeof claimsMapResultSchema>
 export type AuthGetMfaMethodsResult = z.infer<typeof authGetMfaMethodsResultSchema>
 export type AuthStartMfaResult = z.infer<typeof authStartMfaResultSchema>
 export type AuthVerifyMfaResult = z.infer<typeof authVerifyMfaResultSchema>
+export type AuthRegisterMfaResult = z.infer<typeof authRegisterMfaResultSchema>
+export type AuthDisableMfaResult = z.infer<typeof authDisableMfaResultSchema>
 export type ConsentGetPayload = z.infer<typeof consentGetPayloadSchema>
 export type ConsentGetResult = z.infer<typeof consentGetResultSchema>
 export type ConsentSavePayload = z.infer<typeof consentSavePayloadSchema>

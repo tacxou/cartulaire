@@ -69,6 +69,7 @@ declare const module: any
   app.setViewEngine('njk')
 
   app.use('/interaction', urlencoded({ extended: false }))
+  app.use('/account', urlencoded({ extended: false }))
   swagger(app)
 
   const port = cfg.oidc.port ?? 9000

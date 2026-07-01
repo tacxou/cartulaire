@@ -11,6 +11,7 @@ import { IdentityModule } from './identity/identity.module'
 import { ConsentModule } from './consent/consent.module'
 import { AuditModule } from './audit/audit.module'
 import { MfaModule } from './mfa/mfa.module'
+import { AccountModule } from './account/account.module'
 import { SettingsModule } from './settings/settings.module'
 import { ThemesModule } from './themes/themes.module'
 import { ViewContextMiddleware } from './themes/view-context.middleware'
@@ -44,6 +45,7 @@ import { resolveStaticRoot } from './_common/_functions/resolve-static-root'
       useExisting: OidcConfigService,
     }),
     InteractionModule,
+    AccountModule,
   ],
   controllers: [AppController],
   providers: [AppService],

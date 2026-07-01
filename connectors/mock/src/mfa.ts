@@ -1,4 +1,4 @@
-import { createHmac, randomInt, randomUUID } from 'node:crypto'
+import { createHmac, randomBytes, randomInt, randomUUID } from 'node:crypto'
 
 /**
  * MFA côté connecteur (démo). C'est ICI que vit tout le savoir d'un facteur :
@@ -125,6 +125,90 @@ export function startMfa(subject: string, methodId: string) {
     default:
       throw new Error('unsupported method')
   }
+}
+
+// ─── Enrôlement (auth.registerMfa / auth.disableMfa) ────────────────────────
+const B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+function base32(buf: Buffer): string {
+  let bits = 0
+  let val = 0
+  let out = ''
+  for (const b of buf) {
+    val = ((val << 8) | b) >>> 0
+    bits += 8
+    while (bits >= 5) {
+      out += B32[(val >>> (bits - 5)) & 31]
+      bits -= 5
+    }
+    // Ne conserver que les `bits` bits restants — évite le débordement 32 bits.
+    val &= (1 << bits) - 1
+  }
+  if (bits > 0) out += B32[(val << (5 - bits)) & 31]
+  return out
+}
+
+interface Enrollment {
+  subject: string
+  type: MfaMethodType
+  secret?: Buffer
+  code?: string
+  to?: string
+}
+const enrollments = new Map<string, Enrollment>()
+
+function ensureUser(subject: string): UserMfa {
+  if (!MFA_USERS[subject]) MFA_USERS[subject] = { required: true, methods: [] }
+  return MFA_USERS[subject]
+}
+
+export function registerStart(subject: string, type: MfaMethodType, label?: string) {
+  const challengeId = `enr_${randomUUID()}`
+  if (type === 'totp') {
+    const secret = randomBytes(20)
+    enrollments.set(challengeId, { subject, type, secret })
+    const b32 = base32(secret)
+    const uri = `otpauth://totp/Cartulaire:${encodeURIComponent(subject)}?secret=${b32}&issuer=Cartulaire`
+    return { challengeId, type, secret: b32, otpauthUri: uri, hint: 'Scannez le QR/URI, puis entrez le code généré.' }
+  }
+  if (type === 'email_otp' || type === 'sms_otp') {
+    const to = label ?? (type === 'email_otp' ? 'user@example.com' : '+10000000000')
+    const code = randomInt(0, 1_000_000).toString().padStart(6, '0')
+    enrollments.set(challengeId, { subject, type, code, to })
+    outbox.push({ channel: type === 'email_otp' ? 'email' : 'sms', to, code })
+    return { challengeId, type, hint: `Code de vérification envoyé à ${to}.` }
+  }
+  // webauthn / magic_link / recovery : enrôlement à implémenter côté connecteur.
+  return { challengeId, type, hint: 'Enrôlement non encore supporté pour cette méthode.', data: { implemented: false } }
+}
+
+export function registerConfirm(subject: string, challengeId: string, code?: string) {
+  const enr = enrollments.get(challengeId)
+  if (!enr || enr.subject !== subject || !code) return { registered: false }
+
+  let ok = false
+  if (enr.type === 'totp' && enr.secret) ok = verifyTotp(enr.secret, code)
+  else if ((enr.type === 'email_otp' || enr.type === 'sms_otp') && enr.code) ok = enr.code === code
+  if (!ok) return { registered: false }
+
+  const user = ensureUser(subject)
+  user.required = true
+  const methodId = `${enr.type}-${randomUUID().slice(0, 8)}`
+  if (enr.type === 'totp') {
+    user.methods.push({ id: methodId, type: 'totp', label: "Application d'authentification", secret: enr.secret! })
+  } else {
+    user.methods.push({ id: methodId, type: enr.type, label: `Code par ${enr.type === 'email_otp' ? 'email' : 'SMS'}`, to: enr.to! } as OtpMethod)
+  }
+  enrollments.delete(challengeId)
+  return { registered: true, methodId }
+}
+
+export function disableMfa(subject: string, methodId: string): boolean {
+  const user = userOf(subject)
+  if (!user) return false
+  const before = user.methods.length
+  user.methods = user.methods.filter((m) => m.id !== methodId)
+  if (user.methods.length === 0) user.required = false
+  return user.methods.length < before
 }
 
 export function verifyMfa(subject: string, methodId: string, challengeId: string, code?: string): boolean {

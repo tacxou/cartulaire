@@ -4,9 +4,11 @@ import { CommandClient, type CommandTarget } from '@cartulaire/core'
 import {
   COMMANDS,
   type AuthGetMfaMethodsResult,
+  type AuthRegisterMfaResult,
   type AuthStartMfaResult,
   type AuthVerifyMfaResult,
   type MfaMethod,
+  type MfaMethodType,
 } from '@cartulaire/connector-contracts'
 
 /**
@@ -63,5 +65,42 @@ export class MfaService {
       code,
     })
     return res.status === 'success' && !!res.result?.valid
+  }
+
+  /** Initie l'enrôlement d'un facteur (TOTP → secret/otpauth ; OTP → envoi). */
+  async registerStart(subject: string, type: MfaMethodType, label?: string): Promise<AuthRegisterMfaResult | null> {
+    const res = await this.client.send<AuthRegisterMfaResult>(this.target, COMMANDS.AUTH_REGISTER_MFA, {
+      subject,
+      type,
+      phase: 'start',
+      label,
+    })
+    return res.status === 'success' && res.result ? res.result : null
+  }
+
+  /** Confirme l'enrôlement avec le code de vérification. */
+  async registerConfirm(
+    subject: string,
+    type: MfaMethodType,
+    challengeId: string,
+    code: string,
+  ): Promise<boolean> {
+    const res = await this.client.send<AuthRegisterMfaResult>(this.target, COMMANDS.AUTH_REGISTER_MFA, {
+      subject,
+      type,
+      phase: 'confirm',
+      challengeId,
+      code,
+    })
+    return res.status === 'success' && !!res.result?.registered
+  }
+
+  /** Retire un facteur enrôlé. */
+  async disable(subject: string, methodId: string): Promise<boolean> {
+    const res = await this.client.send<{ disabled: boolean }>(this.target, COMMANDS.AUTH_DISABLE_MFA, {
+      subject,
+      methodId,
+    })
+    return res.status === 'success' && !!res.result?.disabled
   }
 }
