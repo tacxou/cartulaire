@@ -1,6 +1,7 @@
 import { Logger, NestApplicationOptions } from '@nestjs/common'
 import Joi from 'joi'
 import { getLogLevel } from './_common/_functions/get-log-level'
+import { resolveStaticRoot } from './_common/_functions/resolve-static-root'
 import { SwaggerCustomOptions } from '@nestjs/swagger'
 import { OidcConfiguration } from 'nest-oidc-provider'
 import { join } from 'node:path'
@@ -73,7 +74,7 @@ export interface ConfigInstance {
 export default async (): Promise<ConfigInstance> => {
   const isProduction = process.env.NODE_ENV === 'production'
   const viewsPath = isProduction ? join(__dirname, 'views') : join(__dirname, '..', 'views')
-  const assetsPath = isProduction ? join(__dirname, 'static') : join(__dirname, '..', 'static')
+  const assetsPath = resolveStaticRoot(__dirname)
 
   return {
     application: {

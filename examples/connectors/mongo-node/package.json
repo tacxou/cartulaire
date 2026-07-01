@@ -1,0 +1,17 @@
+{
+  "name": "cartulaire-connector-mongo-node",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Connecteur d'exemple Cartulaire — MongoDB (Node.js + Mongoose). À copier et adapter.",
+  "license": "AGPL-3.0-only",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@cartulaire/connector-sdk": "*",
+    "@cartulaire/connector-contracts": "*",
+    "bcryptjs": "^2.4.3",
+    "mongoose": "^8.9.5"
+  }
+}

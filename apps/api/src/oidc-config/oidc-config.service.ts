@@ -121,7 +121,31 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
   }
 
   public createAdapterFactory(): AdapterFactory | Promise<AdapterFactory> {
-    return (modelName: string) => new StorageService(modelName, this.dbService)
+    const consent = this.consentService
+    const logger = this.logger
+    return (modelName: string) => {
+      const adapter = new StorageService(modelName, this.dbService)
+
+      // À la destruction d'une session (RP-initiated logout, expiration), le cœur
+      // délègue la révocation au connecteur via `session.revoke` (SPEC §14.4, §19).
+      // Best-effort : on lit le `accountId` AVANT suppression, on n'échoue jamais.
+      if (modelName === 'Session') {
+        const originalDestroy = adapter.destroy.bind(adapter)
+        adapter.destroy = async (id: string): Promise<void> => {
+          try {
+            const session = (await adapter.find(id)) as { accountId?: string } | undefined
+            if (session?.accountId) {
+              await consent.revokeSession({ subject: String(session.accountId), sid: id })
+            }
+          } catch (e) {
+            logger.warn(`session.revoke déléguée en échec: ${e instanceof Error ? e.message : String(e)}`)
+          }
+          return originalDestroy(id)
+        }
+      }
+
+      return adapter
+    }
   }
 
   /**

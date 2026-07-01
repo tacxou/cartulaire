@@ -19,6 +19,9 @@ import { findByIdentifier, findBySub, mapClaims } from './users'
 const consentStore = new Map<string, Set<string>>()
 const consentKey = (subject: string, clientId: string) => `${subject}::${clientId}`
 
+/** Compteur observable de révocations de session (utilisé par les tests). */
+let sessionRevocations = 0
+
 const AUDIENCE = process.env['MOCK_CONNECTOR_AUDIENCE'] ?? 'connector.mock'
 const SECRET = process.env['MOCK_CONNECTOR_SECRET'] ?? 'dev-daemon-connector-secret'
 const PORT = Number(process.env['MOCK_CONNECTOR_PORT'] ?? 8443)
@@ -99,15 +102,17 @@ const commands = [
   }),
 
   defineCommand(COMMANDS.SESSION_REVOKE, (payload) => {
-    // Le mock ne conserve pas de sessions serveur : on accuse simplement réception.
+    // Le mock ne conserve pas de sessions serveur : on accuse réception et on
+    // incrémente un compteur observable (health) pour les tests.
     sessionRevokePayloadSchema.parse(payload)
+    sessionRevocations += 1
     return { revoked: true }
   }),
 
   defineCommand(COMMANDS.ADMIN_HEALTH, () => ({
     status: 'ok' as const,
     connector: 'mock',
-    details: { users: 2, consents: consentStore.size },
+    details: { users: 2, consents: consentStore.size, sessionRevocations },
   })),
 ]
 

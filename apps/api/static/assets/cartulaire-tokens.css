@@ -1,0 +1,25 @@
+/**
+ * Cartulaire — design tokens de marque (SPEC §2.2, §2.3).
+ * Servis statiquement par apps/api (ServeStaticModule), jamais depuis un CDN (§24.4).
+ */
+:root {
+  /* Famille chaude / violette — le sceau (§2.2) */
+  --cartulaire-violet-100: #fcd8fc; /* reflets spéculaires */
+  --cartulaire-violet-400: #c048fc; /* dégradé supérieur du sceau */
+  --cartulaire-violet-500: #a824fc; /* violet de marque principal */
+  --cartulaire-violet-700: #7a0ce0; /* bordures, hover primaire */
+  --cartulaire-violet-900: #4800b4; /* ombres, texte, états actifs */
+
+  /* Famille froide / réseau — fond animé (§2.3) */
+  --cartulaire-bg-900: #020617;
+  --cartulaire-bg-800: #0f172a;
+  --cartulaire-accent-cyan-400: #38bdf8;
+  --cartulaire-accent-cyan-500: #22d3ee;
+  --cartulaire-accent-cyan-300: #67e8f9;
+
+  /* Rôles sémantiques */
+  --cartulaire-primary: var(--cartulaire-violet-500);
+  --cartulaire-primary-hover: var(--cartulaire-violet-700);
+  --cartulaire-primary-dark: var(--cartulaire-violet-900);
+  --cartulaire-focus-ring: var(--cartulaire-violet-500);
+}

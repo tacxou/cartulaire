@@ -13,7 +13,7 @@ import { SettingsModule } from './settings/settings.module'
 import { ThemesModule } from './themes/themes.module'
 import { ViewContextMiddleware } from './themes/view-context.middleware'
 import { ServeStaticModule } from '@nestjs/serve-static'
-import { join } from 'node:path'
+import { resolveStaticRoot } from './_common/_functions/resolve-static-root'
 
 @Module({
   imports: [
@@ -27,7 +27,13 @@ import { join } from 'node:path'
     SettingsModule,
     ThemesModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'static'),
+      rootPath: resolveStaticRoot(__dirname),
+      serveStaticOptions: {
+        index: false,
+        fallthrough: true,
+      },
+      // Pas de SPA : évite le fallback `{*any}` → index.html (v5) sur les assets.
+      renderPath: '/index.html',
     }),
     OidcModule.forRootAsync({
       imports: [OidcConfigModule],
