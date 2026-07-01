@@ -9,6 +9,9 @@
   ],
   "globalPassThroughEnv": [
     "CARTULAIRE_*",
+    "MOCK_*",
+    "DEBUG",
+    "NODE_TLS_REJECT_UNAUTHORIZED",
     "GIT_BRANCH",
     "GIT_COMMIT",
     "GIT_SHA",

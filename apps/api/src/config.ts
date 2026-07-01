@@ -26,6 +26,12 @@ export const validationSchema = Joi.object({
   // Audience du connecteur d'identité ciblé par le cœur (routé par le daemon).
   CARTULAIRE_IDENTITY_AUDIENCE: Joi.string().default('connector.mock'),
   CARTULAIRE_DAEMON_TIMEOUT_MS: Joi.number().positive().default(5000),
+
+  // Redis — utilisé uniquement si CARTULAIRE_STORAGE_ADAPTER=redis (§19, §37).
+  CARTULAIRE_REDIS_URI: Joi.string()
+    .uri({ scheme: ['redis', 'rediss'] })
+    .default('redis://localhost:6379'),
+  CARTULAIRE_REDIS_PASSWORD: Joi.string().allow('').optional(),
 })
 
 export interface ConfigInstance {
@@ -33,6 +39,11 @@ export interface ConfigInstance {
 
   storage: {
     adapter: 'memory' | 'redis'
+  }
+
+  ioredis: {
+    uri: string
+    options?: Record<string, unknown>
   }
 
   oidc: OidcConfiguration & {
@@ -72,6 +83,13 @@ export default async (): Promise<ConfigInstance> => {
 
     storage: {
       adapter: process.env['CARTULAIRE_STORAGE_ADAPTER'] as 'memory' | 'redis',
+    },
+
+    ioredis: {
+      uri: process.env['CARTULAIRE_REDIS_URI']!,
+      options: process.env['CARTULAIRE_REDIS_PASSWORD']
+        ? { password: process.env['CARTULAIRE_REDIS_PASSWORD'] }
+        : {},
     },
 
     oidc: {

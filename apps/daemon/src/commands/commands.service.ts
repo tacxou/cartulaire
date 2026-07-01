@@ -80,8 +80,9 @@ export class CommandsService {
       cmd.payload,
       { traceId: cmd.traceId },
     )
+    const errCode = response.status === 'error' ? ` code=${response.error?.code}` : ''
     this.logger.log(
-      `${cmd.type} → ${connector.name} status=${response.status} durée=${Date.now() - started}ms trace=${cmd.traceId}`,
+      `${cmd.type} → ${connector.name} status=${response.status}${errCode} durée=${Date.now() - started}ms trace=${cmd.traceId}`,
     )
 
     // On préserve l'id d'origine pour la corrélation côté cœur.
