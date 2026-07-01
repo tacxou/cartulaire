@@ -1,0 +1,25 @@
+{
+  "name": "@cartulaire/core",
+  "version": "0.0.1",
+  "description": "Cartulaire core — types partagés et client de commande signé (cœur → daemon → connecteur).",
+  "license": "AGPL-3.0-only",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist/**"],
+  "scripts": {
+    "build": "tsup",
+    "start:dev": "tsup --watch",
+    "test": "vitest run",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@cartulaire/connector-contracts": "*",
+    "@cartulaire/crypto": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "vitest": "^2.1.8"
+  }
+}

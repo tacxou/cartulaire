@@ -1,0 +1,37 @@
+{
+  "name": "@cartulaire/daemon",
+  "version": "0.0.1",
+  "description": "Cartulaire daemon — pont sécurisé qui reçoit les commandes signées et les route vers le bon connecteur.",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "author": "Tacx <12997062+tacxou@users.noreply.github.com>",
+  "scripts": {
+    "build": "nest build",
+    "lint": "eslint \"{src,test}/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main"
+  },
+  "dependencies": {
+    "@cartulaire/connector-contracts": "*",
+    "@cartulaire/core": "*",
+    "@cartulaire/crypto": "*",
+    "@cartulaire/logger": "*",
+    "@nestjs/common": "^10.3.10",
+    "@nestjs/core": "^10.3.10",
+    "@nestjs/platform-express": "^10.3.10",
+    "chalk": "^5.6.2",
+    "joi": "^18.0.2",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.16",
+    "@nestjs/schematics": "^11.0.9",
+    "@swc/cli": "^0.7.10",
+    "@swc/core": "^1.15.11",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.10.0",
+    "source-map-support": "^0.5.21"
+  }
+}

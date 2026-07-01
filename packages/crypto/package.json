@@ -1,0 +1,21 @@
+{
+  "name": "@cartulaire/crypto",
+  "version": "0.0.1",
+  "description": "Cartulaire crypto — signatures de commandes, helpers JWS/JWE et mTLS.",
+  "license": "AGPL-3.0-only",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist/**"],
+  "scripts": {
+    "build": "tsup",
+    "start:dev": "tsup --watch",
+    "test": "vitest run",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "vitest": "^2.1.8"
+  }
+}

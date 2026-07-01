@@ -7,6 +7,7 @@ import { OidcModule } from 'nest-oidc-provider'
 import { OidcConfigService } from './oidc-config/oidc-config.service'
 import { OidcConfigModule } from './oidc-config/oidc-config.module'
 import { InteractionModule } from './interaction/interaction.module'
+import { IdentityModule } from './identity/identity.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'node:path'
 
@@ -17,6 +18,7 @@ import { join } from 'node:path'
       load: [config],
       validationSchema,
     }),
+    IdentityModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'static'),
     }),

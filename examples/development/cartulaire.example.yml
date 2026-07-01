@@ -1,0 +1,61 @@
+# Exemple de configuration Cartulaire (SPEC §32) — développement.
+# Validé au démarrage par @cartulaire/config (Zod, fail-fast).
+# Les secrets sont référencés par variable d'environnement, jamais en clair.
+
+server:
+  publicUrl: http://localhost:9000
+  trustProxy: false
+
+security:
+  cookieSecretEnv: CARTULAIRE_OIDC_COOKIE_KEYS
+  tokenSigningAlg: EdDSA
+
+ui:
+  productName: Cartulaire
+  logo: /assets/logo.svg
+  background: /assets/background.svg
+  theme:
+    primary: "#A824FC"
+    primaryHover: "#7A0CE0"
+    primaryDark: "#4800B4"
+
+protocols:
+  oauth:
+    enabled: true
+  oidc:
+    enabled: true
+  cas:
+    enabled: false
+  saml:
+    enabled: false
+
+# Connecteurs déclarés côté cœur : le daemon route les commandes vers l'audience.
+connectors:
+  mock:
+    type: http
+    url: http://localhost:8443/commands
+    audience: connector.mock
+    auth:
+      mode: signed-hmac
+      secretEnv: CARTULAIRE_CONNECTOR_MOCK_SECRET
+    # Liste blanche de permissions (§26.4), vérifiée daemon + connecteur.
+    permissions:
+      - identity.resolve
+      - auth.verifyPassword
+      - claims.map
+      - admin.health
+
+clients:
+  - id: demo-web
+    name: Demo Web
+    type: confidential
+    secretEnv: DEMO_WEB_SECRET
+    redirectUris:
+      - http://localhost:3000/callback
+    grants:
+      - authorization_code
+      - refresh_token
+    scopes:
+      - openid
+      - profile
+      - email

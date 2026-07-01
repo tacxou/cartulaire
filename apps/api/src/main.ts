@@ -3,14 +3,16 @@ import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import chalk from 'chalk'
 import * as nunjucks from 'nunjucks'
+import { readFileSync } from 'node:fs'
+import type { PackageJson } from 'types-package-json'
 import config from './config'
-import pkg from '../package.json'
 import swagger from './swagger'
 import { AppModule } from './app.module'
 import { urlencoded } from 'body-parser'
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
-const INTERNAL_NAME = process.env?.npm_package_name || pkg?.name!
+const pkg = JSON.parse(readFileSync('package.json', 'utf-8')) as PackageJson
+const INTERNAL_NAME = process.env?.npm_package_name || pkg.name!
 const APP_NAME = INTERNAL_NAME.split('/').pop().toLocaleUpperCase()
 
 declare const module: any
@@ -35,12 +37,13 @@ declare const module: any
   app.use('/interaction', urlencoded({ extended: false }))
   swagger(app)
 
-  await app.listen(9000, () => {
+  const port = cfg.oidc.port ?? 9000
+  await app.listen(port, () => {
     if (process.env.production !== 'production') {
       Logger.warn(chalk.redBright(`Running in development mode 🛠`), `${chalk.redBright(APP_NAME)}\x1b[33m`)
     }
 
-    Logger.log(chalk.bold.blue(`Is now running on <http://0.0.0.0:9000> 🎥`), `${chalk.bold.blue(APP_NAME)}\x1b[33m`)
+    Logger.log(chalk.bold.blue(`Is now running on <http://0.0.0.0:${port}> 🎥`), `${chalk.bold.blue(APP_NAME)}\x1b[33m`)
   })
 
   if (module.hot) {

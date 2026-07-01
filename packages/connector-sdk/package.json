@@ -1,0 +1,25 @@
+{
+  "name": "@cartulaire/connector-sdk",
+  "version": "0.0.1",
+  "description": "SDK officiel Node.js pour écrire un connecteur Cartulaire — vérification de signature, dispatch de commandes, réponses normalisées.",
+  "license": "AGPL-3.0-only",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist/**"],
+  "scripts": {
+    "build": "tsup",
+    "start:dev": "tsup --watch",
+    "test": "vitest run",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@cartulaire/connector-contracts": "*",
+    "@cartulaire/crypto": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "vitest": "^2.1.8"
+  }
+}

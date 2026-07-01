@@ -1,0 +1,21 @@
+{
+  "name": "@cartulaire/logger",
+  "version": "0.0.1",
+  "description": "Cartulaire logger — logs structurés Pino avec redaction des secrets par défaut.",
+  "license": "AGPL-3.0-only",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist/**"],
+  "scripts": {
+    "build": "tsup",
+    "start:dev": "tsup --watch",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "pino": "^9.5.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5"
+  }
+}

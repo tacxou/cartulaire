@@ -2,6 +2,7 @@ import { BadRequestException, Body, Controller, Get, Logger, Post, Req, Res } fr
 import { Request, Response } from 'express'
 import { InjectOidcProvider, InteractionHelper, OidcInteraction, Provider } from 'nest-oidc-provider'
 import { ConsentLabelsService } from '~/consent-labels/consent-labels.service'
+import { IdentityService } from '~/identity/identity.service'
 // import { verifyToken } from 'node-2fa'
 
 @Controller('/interaction')
@@ -11,6 +12,7 @@ export class InteractionController {
   public constructor(
     @InjectOidcProvider() private readonly provider: Provider,
     private readonly consentLabels: ConsentLabelsService,
+    private readonly identity: IdentityService,
   ) {}
 
   @Get(':uid')
@@ -133,13 +135,12 @@ export class InteractionController {
       this.logger.debug(`Login user: ${form.username}`)
       this.logger.debug(`Client ID: ${params.client_id}`)
 
-      // const user = await this.usersService.validateUser(
-      //   form.username,
-      //   form.password,
-      // )
-      // console.log('user', user.toJSON())
-      if (form.username !== 'admin' || form.password !== 'admin') {
-        throw new BadRequestException('Invalid username or password')
+      // Authentification déléguée : identity.resolve + auth.verifyPassword via le
+      // daemon (§22). Le cœur ne connaît ni le stockage ni l'algo de hachage.
+      const account = await this.identity.authenticate(form.username, form.password)
+      if (!account) {
+        // Message générique imposé — ne jamais révéler la cause exacte (§36.1).
+        throw new BadRequestException('Identifiant ou mot de passe invalide.')
       }
 
       if (lastSubmission && lastSubmission.twofa && req.body.token) {
@@ -172,8 +173,7 @@ export class InteractionController {
       return interaction.finished(
         {
           login: {
-            // accountId: user._id.toString(),
-            accountId: '123',
+            accountId: account.sub,
           },
         },
         {

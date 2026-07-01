@@ -1,0 +1,23 @@
+{
+  "name": "@cartulaire/connector-contracts",
+  "version": "0.0.1",
+  "description": "Contrat de commande Cartulaire — schémas Zod et catalogue de commandes partagés entre le cœur et tout connecteur.",
+  "license": "AGPL-3.0-only",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist/**"],
+  "scripts": {
+    "build": "tsup",
+    "start:dev": "tsup --watch",
+    "test": "vitest run",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "vitest": "^2.1.8"
+  }
+}

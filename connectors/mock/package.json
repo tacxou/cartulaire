@@ -1,0 +1,24 @@
+{
+  "name": "@cartulaire/connector-mock",
+  "version": "0.0.1",
+  "description": "Connecteur factice Cartulaire — utilisateurs en mémoire pour développement et démo (SPEC §14, §43 V0).",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "start:dev": "tsx watch src/index.ts",
+    "start:prod": "node dist/index.js",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@cartulaire/connector-contracts": "*",
+    "@cartulaire/connector-sdk": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsup": "^8.3.5",
+    "tsx": "^4.21.0"
+  }
+}
