@@ -42,7 +42,7 @@ export const validationSchema = Joi.object({
   CARTULAIRE_CONNECTOR_MOCK_AUDIENCE: Joi.string().default('connector.mock'),
   CARTULAIRE_CONNECTOR_MOCK_SECRET: Joi.string().min(16).required(),
   CARTULAIRE_CONNECTOR_MOCK_PERMISSIONS: Joi.string().default(
-    'identity.resolve,auth.verifyPassword,claims.map,consent.get,consent.save,consent.revoke,session.revoke,admin.health',
+    'identity.resolve,auth.verifyPassword,auth.getMfaMethods,auth.startMfa,auth.verifyMfa,auth.registerMfa,auth.disableMfa,claims.map,consent.get,consent.save,consent.revoke,session.revoke,admin.health',
   ),
 }).unknown(true)
 
