@@ -37,6 +37,14 @@ export const validationSchema = Joi.object({
   // WebAuthn / passkeys (§23) — contexte Relying Party transmis au connecteur.
   CARTULAIRE_WEBAUTHN_RP_ID: Joi.string().default('localhost'),
   CARTULAIRE_WEBAUTHN_ORIGIN: Joi.string().uri().default('http://localhost:9000'),
+
+  // Rate limiting (§37) et confiance proxy (§38).
+  CARTULAIRE_TRUST_PROXY: Joi.boolean().default(false),
+  CARTULAIRE_RATELIMIT_ENABLED: Joi.boolean().default(true),
+  CARTULAIRE_RATELIMIT_LOGIN_MAX: Joi.number().positive().default(10),
+  CARTULAIRE_RATELIMIT_LOGIN_WINDOW_MS: Joi.number().positive().default(60000),
+  CARTULAIRE_RATELIMIT_OAUTH_MAX: Joi.number().positive().default(60),
+  CARTULAIRE_RATELIMIT_OAUTH_WINDOW_MS: Joi.number().positive().default(60000),
 })
 
 export interface ConfigInstance {
@@ -71,6 +79,13 @@ export interface ConfigInstance {
   webauthn: {
     rpId: string
     origin: string
+  }
+
+  rateLimit: {
+    enabled: boolean
+    trustProxy: boolean
+    login: { max: number; windowMs: number }
+    oauth: { max: number; windowMs: number }
   }
 
   swagger: {
@@ -132,6 +147,19 @@ export default async (): Promise<ConfigInstance> => {
     webauthn: {
       rpId: process.env['CARTULAIRE_WEBAUTHN_RP_ID']!,
       origin: process.env['CARTULAIRE_WEBAUTHN_ORIGIN']!,
+    },
+
+    rateLimit: {
+      enabled: process.env['CARTULAIRE_RATELIMIT_ENABLED'] !== 'false',
+      trustProxy: process.env['CARTULAIRE_TRUST_PROXY'] === 'true',
+      login: {
+        max: parseInt(process.env['CARTULAIRE_RATELIMIT_LOGIN_MAX'] ?? '10', 10),
+        windowMs: parseInt(process.env['CARTULAIRE_RATELIMIT_LOGIN_WINDOW_MS'] ?? '60000', 10),
+      },
+      oauth: {
+        max: parseInt(process.env['CARTULAIRE_RATELIMIT_OAUTH_MAX'] ?? '60', 10),
+        windowMs: parseInt(process.env['CARTULAIRE_RATELIMIT_OAUTH_WINDOW_MS'] ?? '60000', 10),
+      },
     },
 
     swagger: {

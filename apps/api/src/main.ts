@@ -71,6 +71,19 @@ declare const module: any
   app.use('/interaction', urlencoded({ extended: false }))
   app.use('/account', urlencoded({ extended: false }))
   app.use('/account', json()) // endpoints WebAuthn (start/finish) en JSON
+
+  // Rate limiting des endpoints sensibles (SPEC §37).
+  if (cfg.rateLimit.enabled) {
+    const { FixedWindowRateLimiter, rateLimit } = await import('./_common/_rate-limit/rate-limiter')
+    const tp = cfg.rateLimit.trustProxy
+    const loginLimiter = new FixedWindowRateLimiter(cfg.rateLimit.login.windowMs, cfg.rateLimit.login.max)
+    const oauthLimiter = new FixedWindowRateLimiter(cfg.rateLimit.oauth.windowMs, cfg.rateLimit.oauth.max)
+    app.use('/interaction', rateLimit({ name: 'login', limiter: loginLimiter, trustProxy: tp, methods: ['POST'] }))
+    app.use('/oidc/token', rateLimit({ name: 'token', limiter: oauthLimiter, trustProxy: tp, json: true }))
+    app.use('/oidc/device', rateLimit({ name: 'device', limiter: oauthLimiter, trustProxy: tp, json: true }))
+    app.use('/oidc/me', rateLimit({ name: 'userinfo', limiter: oauthLimiter, trustProxy: tp, json: true }))
+  }
+
   swagger(app)
 
   const port = cfg.oidc.port ?? 9000
