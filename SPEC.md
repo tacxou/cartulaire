@@ -737,12 +737,26 @@ Recommandation stricte : `S256` uniquement, `plain` interdit par défaut.
 
 ### 16.1 Endpoints
 
+Le provider OIDC (`oidc-provider`, via `nest-oidc-provider`) est monté sous le préfixe
+`/oidc`. L'identifiant d'émetteur (`CARTULAIRE_OIDC_ISSUER`) **doit inclure** ce préfixe
+(ex. `http://localhost:9000/oidc`) afin que la découverte OpenID Connect reste conforme
+([OIDC Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)) : le
+document est publié à `{issuer}/.well-known/openid-configuration`, soit en développement :
+
 ```txt
-GET /.well-known/openid-configuration
-GET /oidc/jwks
-GET /oidc/userinfo
+GET http://localhost:9000/oidc/.well-known/openid-configuration
+```
+
+Endpoints OIDC exposés (tous sous `/oidc`) :
+
+```txt
+GET  /oidc/.well-known/openid-configuration
+GET  /oidc/jwks
+GET  /oidc/auth
+POST /oidc/token
+GET  /oidc/userinfo
 POST /oidc/logout
-GET /oidc/session/check
+GET  /oidc/session/check
 ```
 
 ### 16.2 Scopes standards
