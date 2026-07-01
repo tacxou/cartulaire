@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cartulaire-connector-sdk"
+version = "0.0.1"
+description = "SDK officiel pour écrire un connecteur Cartulaire en Python — contrat de commande signé (SPEC §13, §31.2)."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "AGPL-3.0-only" }
+authors = [{ name = "Tacx", email = "12997062+tacxou@users.noreply.github.com" }]
+keywords = ["cartulaire", "oidc", "oauth", "identity", "connector", "sdk"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: GNU Affero General Public License v3",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: System :: Systems Administration :: Authentication/Directory",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.urls]
+Homepage = "https://github.com/tacxou/cartulaire"
+Repository = "https://github.com/tacxou/cartulaire"
+Documentation = "https://github.com/tacxou/cartulaire/blob/main/packages/connector-sdk-python/README.md"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cartulaire_connector_sdk"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

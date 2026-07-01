@@ -1,13 +1,15 @@
 # Connecteur MongoDB (Python + pymongo + FastAPI)
 
-Connecteur d'exemple autonome sur MongoDB.
+Connecteur d'exemple sur MongoDB, utilisant le SDK officiel **`cartulaire-connector-sdk`**.
 
 ```bash
 cd examples/connectors/mongo-python
 pip install -r requirements.txt
+# dev local : pip install -e ../../../packages/connector-sdk-python
 CARTULAIRE_CONNECTOR_SECRET="<secret partagé>" \
 MONGODB_URI="mongodb://localhost:27017/cartulaire" \
-uvicorn connector:app --host 0.0.0.0 --port 8443
+CARTULAIRE_CONNECTOR_PORT=8443 \
+python connector.py
 ```
 
 ## Commandes

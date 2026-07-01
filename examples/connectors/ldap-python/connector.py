@@ -12,7 +12,12 @@ import sys
 from ldap3 import Server, Connection, ALL, SUBTREE
 from ldap3.core.exceptions import LDAPBindError
 
-from cartulaire_connector import create_connector_app, CommandFailure, ERROR_CODES
+from cartulaire_connector_sdk import (
+    create_connector_server,
+    define_command,
+    CommandFailure,
+    ERROR_CODES,
+)
 
 AUDIENCE = os.environ.get("CARTULAIRE_CONNECTOR_AUDIENCE", "connector.ldap.main")
 SECRET = os.environ.get("CARTULAIRE_CONNECTOR_SECRET")
@@ -64,14 +69,17 @@ def verify_password(payload, _cmd):
                              "Identifiant ou mot de passe invalide.")
 
 
-app = create_connector_app(
+server = create_connector_server(
     name="ldap-python",
     audience=AUDIENCE,
     secret=SECRET,
     permissions=["identity.resolve", "auth.verifyPassword", "admin.health"],
-    handlers={
-        "identity.resolve": resolve,
-        "auth.verifyPassword": verify_password,
-        "admin.health": lambda p, c: {"status": "ok", "connector": "ldap-python"},
-    },
+    commands=[
+        define_command("identity.resolve", resolve),
+        define_command("auth.verifyPassword", verify_password),
+        define_command("admin.health", lambda p, c: {"status": "ok", "connector": "ldap-python"}),
+    ],
 )
+
+if __name__ == "__main__":
+    server.run(port=int(os.environ.get("CARTULAIRE_CONNECTOR_PORT", 8443)))

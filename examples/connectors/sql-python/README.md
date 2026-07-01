@@ -1,13 +1,16 @@
 # Connecteur SQL (Python + SQLAlchemy + FastAPI)
 
-Connecteur d'exemple autonome sur base SQL via **SQLAlchemy Core** (PostgreSQL par défaut).
+Connecteur d'exemple sur base SQL via **SQLAlchemy Core** (PostgreSQL par défaut),
+utilisant le SDK officiel **`cartulaire-connector-sdk`**.
 
 ```bash
 cd examples/connectors/sql-python
 pip install -r requirements.txt
+# dev local : pip install -e ../../../packages/connector-sdk-python
 CARTULAIRE_CONNECTOR_SECRET="<secret partagé>" \
 DATABASE_URL="postgresql+psycopg://cartulaire:pass@localhost:5432/cartulaire" \
-uvicorn connector:app --host 0.0.0.0 --port 8443
+CARTULAIRE_CONNECTOR_PORT=8443 \
+python connector.py
 ```
 
 ## Schéma minimal

@@ -1,0 +1,53 @@
+name: Publish npm packages
+
+# Publie les librairies @cartulaire/* sur le registre npm.
+# - Déclenchement manuel (workflow_dispatch), ou
+# - sur un tag `npm-v*` (ex. npm-v0.1.0).
+# La publication est idempotente : une version déjà publiée est sautée.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'npm-v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # requis pour la provenance npm (dépôt public)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build packages
+        run: npx turbo run build --filter='./packages/*'
+
+      - name: Publish publishable packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Librairies publiables (les apps/* et connectors/* restent privés).
+          for pkg in connector-contracts crypto core connector-sdk config logger; do
+            dir="packages/$pkg"
+            name=$(node -p "require('./$dir/package.json').name")
+            version=$(node -p "require('./$dir/package.json').version")
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "⏭  $name@$version déjà publié — saut."
+            else
+              echo "📦 Publication de $name@$version"
+              npm publish "$dir" --access public --provenance
+            fi
+          done

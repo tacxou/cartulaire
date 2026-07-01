@@ -1,4 +1,3 @@
-fastapi>=0.115
-uvicorn[standard]>=0.32
+cartulaire-connector-sdk>=0.0.1
 pymongo>=4.10
 bcrypt>=4.2

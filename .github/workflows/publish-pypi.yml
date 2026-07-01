@@ -1,0 +1,56 @@
+name: Publish Python SDK (PyPI)
+
+# Publie cartulaire-connector-sdk sur PyPI.
+# - Déclenchement manuel (workflow_dispatch), ou
+# - sur un tag `pypi-v*` (ex. pypi-v0.1.0).
+#
+# Authentification par « Trusted Publishing » (OIDC) : aucun token à stocker.
+# Configurez un publisher de confiance sur PyPI pour ce dépôt + ce workflow.
+# (Alternative : décommentez `password: ${{ secrets.PYPI_API_TOKEN }}` ci-dessous.)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'pypi-v*'
+
+defaults:
+  run:
+    working-directory: packages/connector-sdk-python
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install (dev) & test
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pytest -q
+
+  build-and-publish:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write # Trusted Publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build sdist & wheel
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: packages/connector-sdk-python/dist
+          # password: ${{ secrets.PYPI_API_TOKEN }}  # si vous préférez un token API

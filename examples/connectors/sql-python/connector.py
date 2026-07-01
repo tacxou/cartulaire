@@ -16,7 +16,12 @@ import sys
 import bcrypt
 from sqlalchemy import create_engine, text
 
-from cartulaire_connector import create_connector_app, CommandFailure, ERROR_CODES
+from cartulaire_connector_sdk import (
+    create_connector_server,
+    define_command,
+    CommandFailure,
+    ERROR_CODES,
+)
 
 AUDIENCE = os.environ.get("CARTULAIRE_CONNECTOR_AUDIENCE", "connector.sql.main")
 SECRET = os.environ.get("CARTULAIRE_CONNECTOR_SECRET")
@@ -89,18 +94,21 @@ def consent_save(payload, _cmd):
     return {"saved": True}
 
 
-app = create_connector_app(
+server = create_connector_server(
     name="sql-python",
     audience=AUDIENCE,
     secret=SECRET,
     permissions=["identity.resolve", "auth.verifyPassword", "claims.map",
                  "consent.get", "consent.save", "admin.health"],
-    handlers={
-        "identity.resolve": resolve,
-        "auth.verifyPassword": verify_password,
-        "claims.map": claims_map,
-        "consent.get": consent_get,
-        "consent.save": consent_save,
-        "admin.health": lambda p, c: {"status": "ok", "connector": "sql-python"},
-    },
+    commands=[
+        define_command("identity.resolve", resolve),
+        define_command("auth.verifyPassword", verify_password),
+        define_command("claims.map", claims_map),
+        define_command("consent.get", consent_get),
+        define_command("consent.save", consent_save),
+        define_command("admin.health", lambda p, c: {"status": "ok", "connector": "sql-python"}),
+    ],
 )
+
+if __name__ == "__main__":
+    server.run(port=int(os.environ.get("CARTULAIRE_CONNECTOR_PORT", 8443)))

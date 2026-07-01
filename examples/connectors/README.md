@@ -16,9 +16,12 @@ expirables**, et renvoyant une réponse normalisée.
 | [`ldap-node`](./ldap-node) | Node.js | LDAP / Active Directory | `ldapts` |
 | [`sql-node`](./sql-node) | Node.js | PostgreSQL / MySQL / SQLite | `kysely` |
 | [`mongo-node`](./mongo-node) | Node.js | MongoDB | `mongoose` |
-| [`ldap-python`](./ldap-python) | Python | LDAP / Active Directory | `ldap3` + `FastAPI` |
-| [`sql-python`](./sql-python) | Python | SQL | `SQLAlchemy` + `FastAPI` |
-| [`mongo-python`](./mongo-python) | Python | MongoDB | `pymongo` + `FastAPI` |
+| [`ldap-python`](./ldap-python) | Python | LDAP / Active Directory | `ldap3` |
+| [`sql-python`](./sql-python) | Python | SQL | `SQLAlchemy` |
+| [`mongo-python`](./mongo-python) | Python | MongoDB | `pymongo` |
+
+Node → SDK [`@cartulaire/connector-sdk`](../../packages/connector-sdk) ·
+Python → SDK [`cartulaire-connector-sdk`](../../packages/connector-sdk-python).
 
 ## Le contrat en bref
 
@@ -47,9 +50,9 @@ où `body` est le corps JSON exact reçu. Le connecteur doit, **avant toute exé
 4. exécuter, puis répondre `{ id, status: "success", result }` ou
    `{ id, status: "error", error: { code, message, safeMessage, retryable } }`.
 
-Les exemples Node délèguent les points 1–4 au SDK `@cartulaire/connector-sdk`.
-Les exemples Python implémentent la vérification à la main (le SDK est un confort,
-pas une obligation — tout langage respectant le contrat est compatible, §31).
+Les exemples Node délèguent les points 1–4 au SDK `@cartulaire/connector-sdk`,
+les exemples Python au SDK `cartulaire-connector-sdk`. Les deux SDK sont un confort,
+pas une obligation — tout langage respectant le contrat HTTP signé est compatible (§31).
 
 ## Sécurité
 
