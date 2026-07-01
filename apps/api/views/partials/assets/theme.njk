@@ -1,0 +1,9 @@
+{# Variables CSS + styles du thème actif #}
+{% if theme.fontGoogleUrl %}
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="{{ theme.fontGoogleUrl }}" rel="stylesheet" />
+{% endif %}
+<style id="cartulaire-theme-{{ theme.id }}">
+{{ theme.styles | safe }}
+</style>

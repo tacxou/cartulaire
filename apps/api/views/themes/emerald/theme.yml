@@ -1,0 +1,46 @@
+id: emerald
+name: Emerald
+description: Vert forêt, ambiance naturelle et sobre
+version: "1.0.0"
+author: Cartulaire
+
+variables:
+  font-family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif'
+
+  color-primary: "#10b981"
+  color-primary-hover: "#059669"
+  color-primary-glow: "rgba(16, 185, 129, 0.38)"
+  color-primary-soft: "#6ee7b7"
+  color-primary-soft-hover: "#a7f3d0"
+
+  color-bg-body: "#022c22"
+  color-bg-page: "#011a14"
+  color-text-page: "#d1fae5"
+
+  glass-edge: "rgba(167, 243, 208, 0.12)"
+  glass-inset: "rgba(255, 255, 255, 0.05)"
+  glass-shadow: "0 24px 48px rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(167, 243, 208, 0.08) inset"
+  glass-shell-bg: "rgba(6, 44, 34, 0.76)"
+  glass-tint-gradient: "linear-gradient(160deg, rgba(16, 185, 129, 0.14) 0%, rgba(6, 44, 34, 0.42) 50%, rgba(2, 26, 20, 0.55) 100%)"
+  glass-inner-bg: "rgba(255, 255, 255, 0.03)"
+  glass-field-bg: "rgba(255, 255, 255, 0.05)"
+  glass-field-border: "rgba(167, 243, 208, 0.16)"
+  glass-field-focus-border: "rgba(16, 185, 129, 0.55)"
+  glass-field-focus-ring: "rgba(16, 185, 129, 0.2)"
+
+  color-badge-bg: "rgba(16, 185, 129, 0.18)"
+  color-badge-text: "#6ee7b7"
+  color-badge-border: "rgba(16, 185, 129, 0.32)"
+  color-badge-subtle-bg: "rgba(16, 185, 129, 0.12)"
+  color-badge-subtle-text: "#a7f3d0"
+  color-badge-subtle-border: "rgba(16, 185, 129, 0.26)"
+
+  index-orb-1: "#064e3b"
+  index-orb-2: "#022c22"
+  index-orb-3: "#14532d"
+  index-grid-color: "rgba(16, 185, 129, 0.06)"
+  index-gradient-text: "linear-gradient(130deg, #6ee7b7 10%, #10b981 60%, #047857)"
+  index-accent: "#10b981"
+  index-accent-dark: "#047857"
+  index-card-hover-border: "rgba(16, 185, 129, 0.38)"
+  index-card-hover-bg: "rgba(16, 185, 129, 0.08)"

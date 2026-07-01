@@ -34,15 +34,32 @@ export const claimsMapPayloadSchema = z.object({
 })
 export const claimsMapResultSchema = z.record(z.unknown())
 
-// consent.get / consent.save (§14.3)
+// consent.get / consent.save / consent.revoke (§14.3)
 export const consentGetPayloadSchema = z.object({
   subject: z.string().min(1),
   clientId: z.string().min(1),
+})
+export const consentGetResultSchema = z.object({
+  /** Scopes déjà consentis par ce sujet pour ce client (vide si aucun). */
+  scopes: z.array(z.string()),
 })
 export const consentSavePayloadSchema = z.object({
   subject: z.string().min(1),
   clientId: z.string().min(1),
   scopes: z.array(z.string()),
+})
+export const consentRevokePayloadSchema = z.object({
+  subject: z.string().min(1),
+  clientId: z.string().min(1),
+})
+
+// session.revoke / session.validate (§14.4, §19)
+export const sessionRevokePayloadSchema = z.object({
+  sid: z.string().optional(),
+  subject: z.string().optional(),
+})
+export const sessionValidatePayloadSchema = z.object({
+  sid: z.string().min(1),
 })
 
 // admin.health (§14.6)
@@ -58,4 +75,8 @@ export type AuthVerifyPasswordPayload = z.infer<typeof authVerifyPasswordPayload
 export type AuthVerifyPasswordResult = z.infer<typeof authVerifyPasswordResultSchema>
 export type ClaimsMapPayload = z.infer<typeof claimsMapPayloadSchema>
 export type ClaimsMapResult = z.infer<typeof claimsMapResultSchema>
+export type ConsentGetPayload = z.infer<typeof consentGetPayloadSchema>
+export type ConsentGetResult = z.infer<typeof consentGetResultSchema>
+export type ConsentSavePayload = z.infer<typeof consentSavePayloadSchema>
+export type SessionRevokePayload = z.infer<typeof sessionRevokePayloadSchema>
 export type AdminHealthResult = z.infer<typeof adminHealthResultSchema>

@@ -16,6 +16,11 @@
         "watchAssets": true
       },
       {
+        "include": "../views/themes/**/*",
+        "outDir": "dist/views/themes",
+        "watchAssets": true
+      },
+      {
         "include": "../config/**/*.yml",
         "outDir": "dist/config",
         "watchAssets": true

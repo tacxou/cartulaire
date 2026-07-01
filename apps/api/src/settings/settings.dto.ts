@@ -1,5 +1,15 @@
 import { Type } from 'class-transformer'
-import { IsBoolean, IsNotEmpty, IsNumber, IsString, Max, Min, ValidateNested } from 'class-validator'
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator'
 
 export class BrandingDto {
   @IsString()
@@ -33,7 +43,21 @@ export class PrefsDto {
   allowRegistration: boolean
 }
 
+export class UiDto {
+  @IsString()
+  @IsNotEmpty()
+  theme: string
+
+  @IsObject()
+  @IsOptional()
+  themeOverrides?: Record<string, string>
+}
+
 export class SettingsDto {
+  @ValidateNested()
+  @Type(() => UiDto)
+  ui: UiDto
+
   @ValidateNested()
   @Type(() => BrandingDto)
   branding: BrandingDto
@@ -42,4 +66,3 @@ export class SettingsDto {
   @Type(() => PrefsDto)
   prefs: PrefsDto
 }
-

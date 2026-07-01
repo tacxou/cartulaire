@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { InjectOidcProvider, InteractionHelper, OidcInteraction, Provider } from 'nest-oidc-provider'
 import { ConsentLabelsService } from '~/consent-labels/consent-labels.service'
 import { IdentityService } from '~/identity/identity.service'
+import { ConsentService } from '~/consent/consent.service'
 // import { verifyToken } from 'node-2fa'
 
 @Controller('/interaction')
@@ -13,6 +14,7 @@ export class InteractionController {
     @InjectOidcProvider() private readonly provider: Provider,
     private readonly consentLabels: ConsentLabelsService,
     private readonly identity: IdentityService,
+    private readonly consent: ConsentService,
   ) {}
 
   @Get(':uid')
@@ -253,6 +255,15 @@ export class InteractionController {
     }
 
     grantId = await grant.save()
+
+    // Persiste le consentement côté connecteur via le daemon (§14.3) — best-effort.
+    const consentedScopes: string[] = Array.isArray((details as any).missingOIDCScope)
+      ? (details as any).missingOIDCScope
+      : []
+    if (consentedScopes.length) {
+      await this.consent.saveConsent(String(accountId), String((params as any).client_id), consentedScopes)
+    }
+
     const consent = {} as any
 
     if (!interactionDetails.grantId) consent.grantId = grantId

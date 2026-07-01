@@ -6,6 +6,7 @@ import { OidcConfigService } from './oidc-config.service'
 import { StorageModule } from '~/storage/storage.module'
 import { ClientsModule } from '~/clients/clients.module'
 import { JwksModule } from '~/jwks/jwks.module'
+import { ThemesModule } from '~/themes/themes.module'
 
 const redisEnabled = process.env['CARTULAIRE_STORAGE_ADAPTER'] === 'redis'
 
@@ -13,6 +14,7 @@ const redisEnabled = process.env['CARTULAIRE_STORAGE_ADAPTER'] === 'redis'
   imports: [
     ClientsModule,
     JwksModule,
+    ThemesModule,
     StorageModule.registerAsync({
       imports: [
         ConfigModule,

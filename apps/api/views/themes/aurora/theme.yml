@@ -1,0 +1,48 @@
+id: aurora
+name: Aurora
+description: Rose et magenta, accents chaleureux
+version: "1.0.0"
+author: Cartulaire
+
+variables:
+  font-family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif'
+  font-index-family: "'Sora', sans-serif"
+  font-google-url: "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap"
+
+  color-primary: "#ec4899"
+  color-primary-hover: "#db2777"
+  color-primary-glow: "rgba(236, 72, 153, 0.42)"
+  color-primary-soft: "#f9a8d4"
+  color-primary-soft-hover: "#fbcfe8"
+
+  color-bg-body: "#1a0a14"
+  color-bg-page: "#120810"
+  color-text-page: "#fce7f3"
+
+  glass-edge: "rgba(251, 207, 232, 0.12)"
+  glass-inset: "rgba(255, 255, 255, 0.05)"
+  glass-shadow: "0 24px 48px rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(251, 207, 232, 0.08) inset"
+  glass-shell-bg: "rgba(36, 14, 28, 0.76)"
+  glass-tint-gradient: "linear-gradient(160deg, rgba(236, 72, 153, 0.14) 0%, rgba(36, 14, 28, 0.4) 50%, rgba(20, 8, 16, 0.55) 100%)"
+  glass-inner-bg: "rgba(255, 255, 255, 0.03)"
+  glass-field-bg: "rgba(255, 255, 255, 0.05)"
+  glass-field-border: "rgba(251, 207, 232, 0.16)"
+  glass-field-focus-border: "rgba(236, 72, 153, 0.55)"
+  glass-field-focus-ring: "rgba(236, 72, 153, 0.22)"
+
+  color-badge-bg: "rgba(236, 72, 153, 0.18)"
+  color-badge-text: "#f9a8d4"
+  color-badge-border: "rgba(236, 72, 153, 0.34)"
+  color-badge-subtle-bg: "rgba(236, 72, 153, 0.12)"
+  color-badge-subtle-text: "#fbcfe8"
+  color-badge-subtle-border: "rgba(236, 72, 153, 0.28)"
+
+  index-orb-1: "#831843"
+  index-orb-2: "#500724"
+  index-orb-3: "#701a75"
+  index-grid-color: "rgba(236, 72, 153, 0.06)"
+  index-gradient-text: "linear-gradient(130deg, #f9a8d4 10%, #ec4899 60%, #9d174d)"
+  index-accent: "#ec4899"
+  index-accent-dark: "#9d174d"
+  index-card-hover-border: "rgba(236, 72, 153, 0.38)"
+  index-card-hover-bg: "rgba(236, 72, 153, 0.08)"

@@ -52,6 +52,10 @@ export class SettingsService implements OnModuleInit, OnModuleDestroy {
     return this.getSettings().prefs
   }
 
+  public getUi(): SettingsDto['ui'] {
+    return this.getSettings().ui
+  }
+
   private load(): void {
     const raw = parseYaml(readFileSync(this._filePath, 'utf8'))
     const dto = plainToInstance(SettingsDto, raw as object, {

@@ -1,0 +1,48 @@
+id: cartulaire
+name: Cartulaire
+description: Violet glassmorphism — thème par défaut
+version: "1.0.0"
+author: Cartulaire
+
+variables:
+  font-family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui, sans-serif'
+  font-index-family: "'Sora', sans-serif"
+  font-google-url: "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap"
+
+  color-primary: "#9146ff"
+  color-primary-hover: "#772ce8"
+  color-primary-glow: "rgba(145, 70, 255, 0.45)"
+  color-primary-soft: "#c4a6ff"
+  color-primary-soft-hover: "#e0d4ff"
+
+  color-bg-body: "#09090b"
+  color-bg-page: "#06060e"
+  color-text-page: "#e8e4ff"
+
+  glass-edge: "rgba(255, 255, 255, 0.12)"
+  glass-inset: "rgba(255, 255, 255, 0.06)"
+  glass-shadow: "0 24px 48px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08) inset"
+  glass-shell-bg: "rgba(18, 16, 28, 0.72)"
+  glass-tint-gradient: "linear-gradient(160deg, rgba(145, 70, 255, 0.12) 0%, rgba(18, 16, 28, 0.35) 50%, rgba(10, 8, 18, 0.5) 100%)"
+  glass-inner-bg: "rgba(255, 255, 255, 0.03)"
+  glass-field-bg: "rgba(255, 255, 255, 0.06)"
+  glass-field-border: "rgba(255, 255, 255, 0.14)"
+  glass-field-focus-border: "rgba(145, 70, 255, 0.55)"
+  glass-field-focus-ring: "rgba(145, 70, 255, 0.2)"
+
+  color-badge-bg: "rgba(145, 70, 255, 0.2)"
+  color-badge-text: "#d4bcff"
+  color-badge-border: "rgba(145, 70, 255, 0.35)"
+  color-badge-subtle-bg: "rgba(145, 70, 255, 0.15)"
+  color-badge-subtle-text: "#c9b3ff"
+  color-badge-subtle-border: "rgba(145, 70, 255, 0.3)"
+
+  index-orb-1: "#2d1469"
+  index-orb-2: "#1e1b4b"
+  index-orb-3: "#312e81"
+  index-grid-color: "rgba(100, 80, 255, 0.05)"
+  index-gradient-text: "linear-gradient(130deg, #c4b5fd 10%, #7c3aed 60%, #4c1d95)"
+  index-accent: "#7c3aed"
+  index-accent-dark: "#4c1d95"
+  index-card-hover-border: "rgba(124, 58, 237, 0.4)"
+  index-card-hover-bg: "rgba(124, 58, 237, 0.07)"

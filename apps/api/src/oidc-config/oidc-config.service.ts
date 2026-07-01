@@ -5,6 +5,7 @@ import { OidcConfiguration, OidcModuleOptions, OidcModuleOptionsFactory } from '
 import * as nunjucks from 'nunjucks'
 import {
   AdapterFactory,
+  Grant,
   Interaction,
   JWKS,
   KoaContextWithOIDC
@@ -14,6 +15,7 @@ import { ClientsService } from '~/clients/clients.service'
 import { JwksService } from '~/jwks/jwks.service'
 import { StorageService } from '~/storage/storage.service'
 import { IdentityService } from '~/identity/identity.service'
+import { ConsentService } from '~/consent/consent.service'
 import { introspectionAllowedPolicy } from './_functions/_features/introspection.function'
 import {
   resourceIndicatorsDefaultResource,
@@ -21,8 +23,8 @@ import {
 } from './_functions/_features/resource-indicators.function'
 import { isPkceRequired } from './_functions/is-pkce-required.function'
 import { issueRefreshToken } from './_functions/issue-refresh-token.function'
-import { loadExistingGrant } from './_functions/load-existing-grant.function'
 import { renderError } from './_functions/render-error.function'
+import { ThemesService } from '~/themes/themes.service'
 
 @Injectable()
 export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit {
@@ -35,6 +37,8 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
     private readonly clientsService: ClientsService,
     private readonly jwksService: JwksService,
     private readonly identityService: IdentityService,
+    private readonly consentService: ConsentService,
+    private readonly themesService: ThemesService,
   ) {}
 
   public async onModuleInit() {
@@ -59,6 +63,48 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
           return { sub, ...mapped }
         },
       }
+    }
+  }
+
+  /**
+   * Construit `loadExistingGrant` (SPEC §14.3). Le consentement n'est jamais
+   * stocké dans le cœur : on interroge le connecteur via `consent.get`. Si des
+   * scopes ont déjà été consentis, on reconstruit un grant pour SAUTER l'écran de
+   * consentement. `skip_consent` (métadonnée client) reste prioritaire.
+   */
+  private buildLoadExistingGrant() {
+    const consent = this.consentService
+    return async (ctx: KoaContextWithOIDC): Promise<Grant | undefined> => {
+      const { client, params, session } = ctx.oidc
+      if (!session?.accountId || !client) return undefined
+
+      const accountId = session.accountId
+      const grantId = ctx.oidc.result?.consent?.grantId ?? session.grantIdFor(client.clientId)
+
+      // Client de confiance : accorde automatiquement tous les scopes demandés.
+      if (client.metadata()?.['skip_consent']) {
+        const grant =
+          (grantId && (await ctx.oidc.provider.Grant.find(grantId))) ||
+          new ctx.oidc.provider.Grant({ accountId, clientId: client.clientId })
+        if (params?.scope) grant.addOIDCScope(params.scope as string)
+        await grant.save()
+        return grant
+      }
+
+      // Grant déjà présent dans la session courante.
+      if (grantId) return ctx.oidc.provider.Grant.find(grantId)
+
+      // Sinon : consulter le consentement délégué. S'il existe, reconstruire un
+      // grant pour éviter de redemander le consentement à chaque connexion.
+      const savedScopes = await consent.getConsent(String(accountId), String(client.clientId))
+      if (savedScopes.length) {
+        const grant = new ctx.oidc.provider.Grant({ accountId, clientId: client.clientId })
+        grant.addOIDCScope(savedScopes.join(' '))
+        await grant.save()
+        return grant
+      }
+
+      return undefined
     }
   }
 
@@ -90,7 +136,8 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
 
     const renderNunjucks = (template: string, data: Record<string, unknown>): string => {
       const nunjucksEnv: nunjucks.Environment = this.httpAdapterHost.httpAdapter.getInstance().get('nunjucksEnv')
-      return nunjucksEnv.render(template, data)
+      const pageKey = this.themesService.resolveTemplatePageKey(template)
+      return nunjucksEnv.render(template, { ...this.themesService.getViewLocals(pageKey), ...data })
     }
 
     return {
@@ -280,7 +327,7 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
        *
        * @see https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#loadexistinggrant
        */
-      loadExistingGrant,
+      loadExistingGrant: this.buildLoadExistingGrant(),
 
       /**
        * Interaction URL generation depends on the type of interaction.
