@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Logger, Post, Req, Res } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, Logger, Post, Query, Req, Res } from '@nestjs/common'
 import { Request, Response } from 'express'
 import {
   InjectOidcProvider,
@@ -9,10 +9,11 @@ import {
   Provider,
 } from 'nest-oidc-provider'
 import { ConsentLabelsService } from '~/consent-labels/consent-labels.service'
+import { ClientsService } from '~/clients/clients.service'
 import { IdentityService } from '~/identity/identity.service'
 import { ConsentService } from '~/consent/consent.service'
 import { AuditService } from '~/audit/audit.service'
-// import { verifyToken } from 'node-2fa'
+import { MfaService } from '~/mfa/mfa.service'
 
 @Controller('/interaction')
 export class InteractionController {
@@ -21,10 +22,49 @@ export class InteractionController {
   public constructor(
     @InjectOidcProvider() private readonly provider: Provider,
     private readonly consentLabels: ConsentLabelsService,
+    private readonly clientsService: ClientsService,
     private readonly identity: IdentityService,
     private readonly consent: ConsentService,
     private readonly audit: AuditService,
+    private readonly mfa: MfaService,
   ) {}
+
+  private buildOAuthErrorRedirect(
+    params: Record<string, unknown>,
+    error: string,
+    errorDescription: string,
+  ): string | null {
+    const redirectUri = params.redirect_uri
+    if (typeof redirectUri !== 'string' || !redirectUri) return null
+
+    const url = new URL(redirectUri)
+    url.searchParams.set('error', error)
+    url.searchParams.set('error_description', errorDescription)
+    if (params.state != null && params.state !== '') {
+      url.searchParams.set('state', String(params.state))
+    }
+    return url.toString()
+  }
+
+  private isAllowedOAuthReturnTo(returnTo: string): boolean {
+    let target: URL
+    try {
+      target = new URL(returnTo)
+    } catch {
+      return false
+    }
+
+    return this.clientsService.getClients().some((client) =>
+      (client.redirect_uris ?? []).some((uri) => {
+        try {
+          const registered = new URL(uri)
+          return target.origin === registered.origin && target.pathname === registered.pathname
+        } catch {
+          return returnTo.startsWith(uri)
+        }
+      }),
+    )
+  }
 
   @Get(':uid')
   public async interaction(
@@ -41,12 +81,13 @@ export class InteractionController {
       console.log('lastSubmission', lastSubmission)
       const client = await this.provider.Client.find((params as any).client_id)
 
-      if (lastSubmission && lastSubmission.twofa) {
-        return res.render('2fa', {
+      // Étape MFA en cours (le mot de passe a été validé, on attend le 2ᵉ facteur).
+      if (lastSubmission && (lastSubmission as any).mfa) {
+        return res.render('pages/2fa', {
           client,
           uid,
           params,
-          details: prompt.details,
+          mfa: (lastSubmission as any).mfa,
           session,
         })
       }
@@ -141,53 +182,94 @@ export class InteractionController {
         })
       }
 
-      // console.log('Login form', form)
+      const clientId = String((params as any).client_id ?? '')
+
+      // ── Étape 2 : vérification du second facteur (MFA) ──────────────────────
+      // Le mot de passe a déjà été validé à l'étape 1 ; l'état MFA (sujet, méthode,
+      // défi) est conservé côté serveur dans `lastSubmission.mfa`.
+      const pendingMfa = lastSubmission && (lastSubmission as any).mfa
+      if (pendingMfa) {
+        const valid = await this.mfa.verify(
+          pendingMfa.subject,
+          pendingMfa.methodId,
+          pendingMfa.challengeId,
+          form.code,
+        )
+        if (!valid) {
+          this.audit.mfaFailure(pendingMfa.subject, pendingMfa.type, clientId)
+          const client = await this.provider.Client.find(clientId)
+          // On rejoue l'écran MFA avec le même défi (message générique).
+          return res.status(400).render('pages/2fa', {
+            client,
+            uid,
+            params,
+            mfa: pendingMfa,
+            errorMessage: 'Code invalide.',
+          })
+        }
+        this.audit.mfaSuccess(pendingMfa.subject, pendingMfa.type, clientId)
+        // Valeurs amr normalisées RFC 8176 (pwd, otp, sms, swk…) + 'mfa'.
+        const factorAmr: Record<string, string> = {
+          totp: 'otp',
+          email_otp: 'otp',
+          sms_otp: 'sms',
+          magic_link: 'otp',
+          webauthn: 'swk',
+          recovery: 'mfa',
+        }
+        const amr = [...new Set(['pwd', factorAmr[pendingMfa.type] ?? 'mfa', 'mfa'])]
+        return interaction.finished(
+          {
+            login: {
+              accountId: pendingMfa.subject,
+              acr: 'urn:cartulaire:loa:2',
+              amr,
+            },
+          },
+          { mergeWithLastSubmission: false },
+        )
+      }
+
+      // ── Étape 1 : mot de passe (délégué au daemon, §22) ─────────────────────
       this.logger.debug(`Login UID: ${uid}`)
-      this.logger.debug(`Login user: ${form.username}`)
       this.logger.debug(`Client ID: ${params.client_id}`)
 
-      // Authentification déléguée : identity.resolve + auth.verifyPassword via le
-      // daemon (§22). Le cœur ne connaît ni le stockage ni l'algo de hachage.
       const account = await this.identity.authenticate(form.username, form.password)
       if (!account) {
-        // Audit : échec sans divulguer l'identifiant tenté (§35, §36.1).
-        this.audit.loginFailure('invalid_credentials', String((params as any).client_id ?? ''))
+        this.audit.loginFailure('invalid_credentials', clientId)
         // Message générique imposé — ne jamais révéler la cause exacte (§36.1).
         throw new BadRequestException('Identifiant ou mot de passe invalide.')
       }
-      this.audit.loginSuccess(account.sub, String((params as any).client_id ?? ''))
+      this.audit.loginSuccess(account.sub, clientId)
 
-      if (lastSubmission && lastSubmission.twofa && req.body.token) {
-        // console.log('verif', verifyToken(user.googleAuthKey, req.body.token))
-        // if (!verifyToken(user.googleAuthKey, req.body.token)) {
-        //   return interaction.finished(
-        //     {
-        //       twofa: true,
-        //       form,
-        //     },
-        //     {
-        //       mergeWithLastSubmission: false,
-        //     },
-        //   )
-        // }
-      } else {
-        // if (user.googleAuthKey) {
-        //   return interaction.finished(
-        //     {
-        //       twofa: true,
-        //       form,
-        //     },
-        //     {
-        //       mergeWithLastSubmission: false,
-        //     },
-        //   )
-        // }
+      // Step-up : si le connecteur exige un second facteur, on initie un défi et
+      // on boucle sur l'interaction sans satisfaire le prompt `login` (§23).
+      const mfaInfo = await this.mfa.getMethods(account.sub, clientId)
+      if (mfaInfo.required && mfaInfo.methods.length > 0) {
+        const method = mfaInfo.methods[0] // choix par défaut ; l'UI pourrait proposer une sélection
+        const challenge = await this.mfa.start(account.sub, method.id)
+        if (challenge) {
+          return interaction.finished(
+            {
+              mfa: {
+                subject: account.sub,
+                methodId: method.id,
+                type: method.type,
+                challengeId: challenge.challengeId,
+                hint: challenge.hint,
+              },
+            },
+            { mergeWithLastSubmission: false },
+          )
+        }
+        this.logger.warn(`MFA requis mais défi indisponible pour ${account.sub}`)
       }
 
       return interaction.finished(
         {
           login: {
             accountId: account.sub,
+            amr: ['pwd'],
           },
         },
         {
@@ -299,12 +381,18 @@ export class InteractionController {
   @Get(':uid/abort/sign-out')
   public async abortSignOut(
     @OidcContext() ctx: KoaContextWithOIDC,
+    @Query('returnTo') returnTo: string | undefined,
     @Res() res: Response,
   ): Promise<void> {
     const session = await ctx.oidc.provider.Session.get(ctx)
     if (session) {
       await session.destroy()
       this.logger.debug('OIDC session destroyed after consent abort')
+    }
+
+    if (returnTo && this.isAllowedOAuthReturnTo(returnTo)) {
+      res.redirect(302, returnTo)
+      return
     }
 
     res.render('pages/logout-success', { clientDisplay: null })
@@ -339,13 +427,26 @@ export class InteractionController {
   }
 
   @Get(':uid/abort/complete')
-  public async abortLogin(@OidcInteraction() interaction: InteractionHelper): Promise<void> {
-    await interaction.finished(
+  public async abortComplete(
+    @OidcInteraction() interaction: InteractionHelper,
+    @Res() res: Response,
+  ): Promise<void> {
+    const { params } = await interaction.details()
+    const resumeUrl = await interaction.result(
       {
         error: 'access_denied',
         error_description: 'End-user aborted interaction',
       },
       { mergeWithLastSubmission: false },
     )
+
+    res.json({
+      resumeUrl,
+      fallbackRedirectUrl: this.buildOAuthErrorRedirect(
+        params as Record<string, unknown>,
+        'access_denied',
+        'End-user aborted interaction',
+      ),
+    })
   }
 }

@@ -20,6 +20,7 @@ export const COMMANDS = {
   AUTH_VERIFY_PASSWORD: 'auth.verifyPassword',
   AUTH_VERIFY_MFA: 'auth.verifyMfa',
   AUTH_GET_MFA_METHODS: 'auth.getMfaMethods',
+  AUTH_START_MFA: 'auth.startMfa',
   AUTH_REGISTER_MFA: 'auth.registerMfa',
   AUTH_DISABLE_MFA: 'auth.disableMfa',
   AUTH_CHANGE_PASSWORD: 'auth.changePassword',

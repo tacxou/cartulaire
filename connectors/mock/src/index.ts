@@ -1,4 +1,7 @@
 import {
+  authGetMfaMethodsPayloadSchema,
+  authStartMfaPayloadSchema,
+  authVerifyMfaPayloadSchema,
   authVerifyPasswordPayloadSchema,
   claimsMapPayloadSchema,
   COMMANDS,
@@ -11,6 +14,7 @@ import {
 } from '@cartulaire/connector-contracts'
 import { CommandFailure, createConnectorServer, defineCommand } from '@cartulaire/connector-sdk'
 import { findByIdentifier, findBySub, mapClaims } from './users'
+import { getMfaMethods, outbox, startMfa, verifyMfa } from './mfa'
 
 /**
  * Store de consentement en mémoire — clé `${subject}::${clientId}` → scopes.
@@ -30,6 +34,9 @@ const PORT = Number(process.env['MOCK_CONNECTOR_PORT'] ?? 8443)
 const PERMISSIONS = [
   COMMANDS.IDENTITY_RESOLVE,
   COMMANDS.AUTH_VERIFY_PASSWORD,
+  COMMANDS.AUTH_GET_MFA_METHODS,
+  COMMANDS.AUTH_START_MFA,
+  COMMANDS.AUTH_VERIFY_MFA,
   COMMANDS.CLAIMS_MAP,
   COMMANDS.CONSENT_GET,
   COMMANDS.CONSENT_SAVE,
@@ -64,7 +71,30 @@ const commands = [
         'Identifiant ou mot de passe invalide.',
       )
     }
-    return { valid: true, mfaRequired: false }
+    return { valid: true, mfaRequired: getMfaMethods(subject).required }
+  }),
+
+  defineCommand(COMMANDS.AUTH_GET_MFA_METHODS, (payload) => {
+    const { subject } = authGetMfaMethodsPayloadSchema.parse(payload)
+    return getMfaMethods(subject)
+  }),
+
+  defineCommand(COMMANDS.AUTH_START_MFA, (payload) => {
+    const { subject, methodId } = authStartMfaPayloadSchema.parse(payload)
+    try {
+      return startMfa(subject, methodId)
+    } catch {
+      throw new CommandFailure(ERROR_CODES.VALIDATION_ERROR, 'unknown mfa method', 'Une erreur est survenue.')
+    }
+  }),
+
+  defineCommand(COMMANDS.AUTH_VERIFY_MFA, (payload) => {
+    const { subject, methodId, challengeId, code } = authVerifyMfaPayloadSchema.parse(payload)
+    const valid = verifyMfa(subject, methodId, challengeId, code)
+    if (!valid) {
+      throw new CommandFailure(ERROR_CODES.MFA_INVALID, 'invalid mfa response', 'Code invalide.')
+    }
+    return { valid: true }
   }),
 
   defineCommand(COMMANDS.CLAIMS_MAP, (payload) => {
@@ -112,7 +142,7 @@ const commands = [
   defineCommand(COMMANDS.ADMIN_HEALTH, () => ({
     status: 'ok' as const,
     connector: 'mock',
-    details: { users: 2, consents: consentStore.size, sessionRevocations },
+    details: { users: 2, consents: consentStore.size, sessionRevocations, mfaOutbox: outbox.length },
   })),
 ]
 

@@ -1,0 +1,40 @@
+{% extends "layouts/main.njk" %}
+
+{% block content %}
+<div class="w-full max-w-md overflow-hidden rounded-[1.75rem] glass-shell">
+  <div class="p-8 sm:p-10 lg:p-12 glass-inner backdrop-blur-sm">
+    <div class="flex flex-col items-center mb-8">
+      <img src="{{ branding.logo }}" width="112" height="112" alt="" decoding="async"
+        class="w-20 h-20 object-contain select-none" />
+      <h2 class="mt-6 text-2xl font-semibold tracking-tight text-zinc-50">Vérification en deux étapes</h2>
+      <p class="mt-1.5 text-[15px] text-zinc-500 text-center">
+        {{ mfa.hint | default("Entrez le code de votre second facteur.") }}
+      </p>
+    </div>
+
+    {% if errorMessage %}
+    <div class="mb-5 rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+      {{ errorMessage }}
+    </div>
+    {% endif %}
+
+    <form action="/interaction/{{ uid }}" method="POST" autocomplete="off" class="space-y-5">
+      <div>
+        <label for="code" class="block text-[13px] font-medium text-zinc-400 mb-2">Code de vérification</label>
+        <input type="text" name="code" id="code" inputmode="numeric" autocomplete="one-time-code"
+          pattern="[0-9A-Za-z]*" required autofocus
+          class="glass-field block w-full rounded-2xl px-4 py-3 text-center text-lg tracking-[0.3em] placeholder:text-zinc-600 transition" />
+      </div>
+
+      <button type="submit"
+        class="btn-primary w-full rounded-full px-4 py-3.5 text-[15px] transition active:scale-[0.99]">
+        Vérifier
+      </button>
+
+      <p class="text-center text-[13px] text-zinc-500 pt-2">
+        <a href="/interaction/{{ uid }}/abort" class="link-accent font-medium transition">Annuler</a>
+      </p>
+    </form>
+  </div>
+</div>
+{% endblock %}

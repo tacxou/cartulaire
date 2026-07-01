@@ -30,6 +30,14 @@ export class AuditService {
     this.emit({ type: AUDIT_EVENTS.LOGIN_FAILURE, reason, clientId, traceId, protocol: 'oidc' })
   }
 
+  mfaSuccess(subject: string, method: string, clientId?: string): void {
+    this.emit({ type: AUDIT_EVENTS.MFA_SUCCESS, subject, clientId, protocol: 'oidc', data: { method } })
+  }
+
+  mfaFailure(subject: string, method: string, clientId?: string): void {
+    this.emit({ type: AUDIT_EVENTS.MFA_FAILURE, subject, clientId, protocol: 'oidc', data: { method } })
+  }
+
   consentAccepted(subject: string, clientId: string, scopes: string[]): void {
     this.emit({
       type: AUDIT_EVENTS.OAUTH_CONSENT_ACCEPTED,

@@ -19,16 +19,27 @@
     const signOutUrl = '/interaction/{{ uid }}/abort/sign-out'
 
     window
-      .fetch(abortCompleteUrl, {
-        method: 'GET',
-        credentials: 'include',
-        redirect: 'follow',
-        keepalive: true,
+      .fetch(abortCompleteUrl, { method: 'GET', credentials: 'include' })
+      .then(function (res) {
+        return res.json()
+      })
+      .then(function (body) {
+        return window
+          .fetch(body.resumeUrl, { method: 'GET', credentials: 'include', redirect: 'follow' })
+          .then(function (res) {
+            return res.url || body.fallbackRedirectUrl
+          })
+          .catch(function () {
+            return body.fallbackRedirectUrl
+          })
+      })
+      .then(function (clientUrl) {
+        const dest = clientUrl
+          ? signOutUrl + '?returnTo=' + encodeURIComponent(clientUrl)
+          : signOutUrl
+        window.location.assign(dest)
       })
       .catch(function () {
-        // En cas d'échec (ex. redirect cross-origin), on tente quand même la déconnexion.
-      })
-      .finally(function () {
         window.location.assign(signOutUrl)
       })
   })()

@@ -172,6 +172,8 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
       clients,
       features: {
         devInteractions: { enabled: false },
+        // Permet aux RP de demander explicitement acr/amr/auth_time via `claims`.
+        claimsParameter: { enabled: true },
         userinfo: { enabled: true },
         jwtUserinfo: { enabled: true },
         deviceFlow: { enabled: true },
@@ -286,6 +288,22 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
         profile: ['name', 'preferred_username'],
         email: ['email', 'email_verified'],
       },
+
+      /**
+       * ID Token « riche » : inclut auth_time, acr, amr (et les claims de scope)
+       * comme exigé par la SPEC §16.3/§20.2. Par défaut oidc-provider (true) ne
+       * mettrait ces claims que sur demande explicite (acr_values/max_age).
+       *
+       * @see https://github.com/panva/node-oidc-provider/blob/main/docs/README.md#conformidtokenclaims
+       */
+      conformIdTokenClaims: false,
+
+      /**
+       * Niveaux d'assurance (ACR) reconnus. oidc-provider ignore un `acr` de
+       * résultat de login s'il n'est pas déclaré ici (SPEC §19 ACR/AMR).
+       * loa:1 = mot de passe seul ; loa:2 = mot de passe + second facteur.
+       */
+      acrValues: ['urn:cartulaire:loa:1', 'urn:cartulaire:loa:2'],
 
       /**
        * The `issueRefreshToken` function is responsible for determining whether a refresh token should be issued for a given client and authorization code.

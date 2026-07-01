@@ -26,6 +26,63 @@ export const authVerifyPasswordResultSchema = z.object({
   mfaRequired: z.boolean().default(false),
 })
 
+// ─── MFA / second facteur (§14.2, §23) ──────────────────────────────────────
+// Cadre GÉNÉRIQUE : le connecteur possède chaque méthode (secret TOTP, envoi
+// SMS/email, credentials WebAuthn). Le cœur orchestre getMfaMethods → startMfa →
+// verifyMfa sans jamais connaître l'implémentation d'un facteur.
+
+/** Types de second facteur reconnus par le catalogue. */
+export const MFA_METHOD_TYPES = ['totp', 'email_otp', 'sms_otp', 'magic_link', 'webauthn', 'recovery'] as const
+export type MfaMethodType = (typeof MFA_METHOD_TYPES)[number]
+
+export const mfaMethodSchema = z.object({
+  /** Identifiant stable de la méthode enrôlée (opaque côté cœur). */
+  id: z.string().min(1),
+  type: z.enum(MFA_METHOD_TYPES),
+  /** Libellé affichable (ex. "Application d'authentification", "SMS ****89"). */
+  label: z.string(),
+})
+export type MfaMethod = z.infer<typeof mfaMethodSchema>
+
+// auth.getMfaMethods — quelles méthodes pour ce sujet, et le MFA est-il requis ?
+export const authGetMfaMethodsPayloadSchema = z.object({
+  subject: z.string().min(1),
+  clientId: z.string().optional(),
+})
+export const authGetMfaMethodsResultSchema = z.object({
+  required: z.boolean(),
+  methods: z.array(mfaMethodSchema),
+})
+
+// auth.startMfa — initie un défi pour une méthode (envoi OTP, options WebAuthn…)
+export const authStartMfaPayloadSchema = z.object({
+  subject: z.string().min(1),
+  methodId: z.string().min(1),
+})
+export const authStartMfaResultSchema = z.object({
+  /** Identifiant du défi, à repasser à verifyMfa (anti-rejeu, corrélation). */
+  challengeId: z.string().min(1),
+  type: z.enum(MFA_METHOD_TYPES),
+  /** Indice non sensible affiché à l'utilisateur (ex. "Code envoyé à c***@ex.com"). */
+  hint: z.string().optional(),
+  /** Données spécifiques à la méthode (ex. options WebAuthn) — opaques pour le cœur. */
+  data: z.record(z.unknown()).optional(),
+})
+
+// auth.verifyMfa — vérifie la réponse au défi
+export const authVerifyMfaPayloadSchema = z.object({
+  subject: z.string().min(1),
+  methodId: z.string().min(1),
+  challengeId: z.string().min(1),
+  /** Code saisi (TOTP, OTP, code de secours). */
+  code: z.string().optional(),
+  /** Réponse structurée (assertion WebAuthn…) — opaque pour le cœur. */
+  response: z.record(z.unknown()).optional(),
+})
+export const authVerifyMfaResultSchema = z.object({
+  valid: z.boolean(),
+})
+
 // claims.map — projette un sujet + scopes vers des claims OIDC (§16.4)
 export const claimsMapPayloadSchema = z.object({
   subject: z.string().min(1),
@@ -75,6 +132,9 @@ export type AuthVerifyPasswordPayload = z.infer<typeof authVerifyPasswordPayload
 export type AuthVerifyPasswordResult = z.infer<typeof authVerifyPasswordResultSchema>
 export type ClaimsMapPayload = z.infer<typeof claimsMapPayloadSchema>
 export type ClaimsMapResult = z.infer<typeof claimsMapResultSchema>
+export type AuthGetMfaMethodsResult = z.infer<typeof authGetMfaMethodsResultSchema>
+export type AuthStartMfaResult = z.infer<typeof authStartMfaResultSchema>
+export type AuthVerifyMfaResult = z.infer<typeof authVerifyMfaResultSchema>
 export type ConsentGetPayload = z.infer<typeof consentGetPayloadSchema>
 export type ConsentGetResult = z.infer<typeof consentGetResultSchema>
 export type ConsentSavePayload = z.infer<typeof consentSavePayloadSchema>
