@@ -54,10 +54,14 @@ export class MfaService {
   }
 
   /** Initie un défi pour la méthode choisie (envoi OTP, options WebAuthn…). */
-  async start(subject: string, methodId: string): Promise<AuthStartMfaResult | null> {
+  async start(subject: string, methodId: string, interactionUid?: string): Promise<AuthStartMfaResult | null> {
+    // Le cœur possède l'uid d'interaction : il construit la base du lien magique
+    // (§14.2) que le connecteur complètera avec le jeton et enverra par email.
+    const linkBase = interactionUid ? `${this.rp.origin}/interaction/${interactionUid}/magic` : undefined
     const res = await this.client.send<AuthStartMfaResult>(this.target, COMMANDS.AUTH_START_MFA, {
       subject,
       methodId,
+      linkBase,
       ...this.rp, // rpId/origin — nécessaires pour WebAuthn (ignorés par TOTP/OTP)
     })
     return res.status === 'success' && res.result ? res.result : null

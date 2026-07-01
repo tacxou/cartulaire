@@ -38,6 +38,15 @@ export const MOCK_USERS: MockUser[] = [
     claims: { name: 'Bob', preferred_username: 'bob', email: 'bob@example.com', email_verified: true },
   },
   {
+    // Utilisateur dont le 2ᵉ facteur est un lien magique par email.
+    sub: 'user_dave',
+    username: 'dave',
+    email: 'dave@example.com',
+    password: 'davepass',
+    groups: ['users'],
+    claims: { name: 'Dave', preferred_username: 'dave', email: 'dave@example.com', email_verified: true },
+  },
+  {
     sub: 'user_alice',
     username: 'alice',
     email: 'alice@example.com',

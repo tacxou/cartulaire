@@ -18,7 +18,17 @@
     </div>
     {% endif %}
 
-    {% if mfa.type == 'webauthn' %}
+    {% if mfa.type == 'magic_link' %}
+    <div class="text-center space-y-4">
+      <div class="rounded-2xl border border-violet-400/30 bg-violet-500/10 px-4 py-5 text-[15px] text-zinc-200">
+        Un lien de connexion vous a été envoyé par email.<br />Ouvrez-le sur cet appareil pour continuer.
+      </div>
+      <p class="text-[13px] text-zinc-500">{{ mfa.hint }}</p>
+      <p class="text-center text-[13px] text-zinc-500 pt-2">
+        <a href="/interaction/{{ uid }}/abort" class="link-accent font-medium transition">Annuler</a>
+      </p>
+    </div>
+    {% elif mfa.type == 'webauthn' %}
     <form id="wa-form" action="/interaction/{{ uid }}" method="POST">
       <input type="hidden" name="response" />
     </form>

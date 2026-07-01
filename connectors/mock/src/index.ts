@@ -84,9 +84,9 @@ const commands = [
   }),
 
   defineCommand(COMMANDS.AUTH_START_MFA, (payload) => {
-    const { subject, methodId, rpId, origin } = authStartMfaPayloadSchema.parse(payload)
+    const { subject, methodId, rpId, origin, linkBase } = authStartMfaPayloadSchema.parse(payload)
     try {
-      return startMfa(subject, methodId, { rpId, origin })
+      return startMfa(subject, methodId, { rpId, origin, linkBase })
     } catch {
       throw new CommandFailure(ERROR_CODES.VALIDATION_ERROR, 'unknown mfa method', 'Une erreur est survenue.')
     }
@@ -162,7 +162,14 @@ const commands = [
   defineCommand(COMMANDS.ADMIN_HEALTH, () => ({
     status: 'ok' as const,
     connector: 'mock',
-    details: { users: 2, consents: consentStore.size, sessionRevocations, mfaOutbox: outbox.length },
+    details: {
+      users: 2,
+      consents: consentStore.size,
+      sessionRevocations,
+      mfaOutbox: outbox.length,
+      // Démo/tests uniquement : dernier lien magique « envoyé ».
+      lastMagicLink: outbox.length ? (outbox[outbox.length - 1].link ?? null) : null,
+    },
   })),
 ]
 

@@ -14,6 +14,8 @@ export interface WebauthnCtx {
   origin?: string
   userName?: string
   response?: Record<string, unknown>
+  /** Base d'URL du lien magique (fournie par le cœur avec l'uid d'interaction). */
+  linkBase?: string
 }
 
 /**
@@ -34,7 +36,7 @@ interface TotpMethod extends BaseMethod {
   secret: Buffer
 }
 interface OtpMethod extends BaseMethod {
-  type: 'email_otp' | 'sms_otp'
+  type: 'email_otp' | 'sms_otp' | 'magic_link'
   to: string
 }
 interface RecoveryMethod extends BaseMethod {
@@ -61,10 +63,14 @@ const MFA_USERS: Record<string, UserMfa> = {
     required: true,
     methods: [{ id: 'email-1', type: 'email_otp', label: 'Code par email', to: 'alice@example.com' }],
   },
+  user_dave: {
+    required: true,
+    methods: [{ id: 'magic-1', type: 'magic_link', label: 'Lien magique par email', to: 'dave@example.com' }],
+  },
 }
 
-/** « Boîte d'envoi » observable — les OTP envoyés (pour les tests/démo uniquement). */
-export const outbox: Array<{ channel: 'email' | 'sms'; to: string; code: string }> = []
+/** « Boîte d'envoi » observable — OTP/liens envoyés (pour les tests/démo uniquement). */
+export const outbox: Array<{ channel: 'email' | 'sms'; to: string; code: string; link?: string }> = []
 
 interface Challenge {
   subject: string
@@ -138,10 +144,20 @@ export function startMfa(subject: string, methodId: string, ctx: WebauthnCtx = {
       challenges.set(challengeId, base)
       return { challengeId, type: method.type, hint: 'Entrez un de vos codes de secours.' }
 
-    case 'magic_link':
+    case 'magic_link': {
+      // Jeton long à usage unique, transporté par un lien cliquable (out-of-band).
+      const token = randomBytes(24).toString('hex')
+      challenges.set(challengeId, { ...base, code: token })
+      const to = (method as OtpMethod).to
+      const link = ctx.linkBase ? `${ctx.linkBase}?token=${token}` : token
+      outbox.push({ channel: 'email', to, code: token, link }) // « envoi » simulé
+      const masked = to.replace(/(.).*(.@|.{2}$)/, '$1***$2')
+      return { challengeId, type: method.type, hint: `Lien de connexion envoyé par email à ${masked}.` }
+    }
+
     case 'webauthn':
-      // Contrat prêt ; implémentation connecteur à fournir (voir README).
-      return { challengeId, type: method.type, hint: 'Méthode non encore implémentée par ce connecteur.', data: { implemented: false } }
+      // Piloté via startMfa(webauthn) → webauthnAuthOptions (voir plus haut).
+      return { challengeId, type: method.type, hint: 'Utilisez votre passkey.', data: { implemented: false } }
 
     default:
       throw new Error('unsupported method')
@@ -272,6 +288,7 @@ export function verifyMfa(
       break
     case 'email_otp':
     case 'sms_otp':
+    case 'magic_link':
       ok = ch.code === code
       break
     case 'recovery': {

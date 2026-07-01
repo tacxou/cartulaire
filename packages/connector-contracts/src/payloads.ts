@@ -66,6 +66,8 @@ export const authStartMfaPayloadSchema = z
   .object({
     subject: z.string().min(1),
     methodId: z.string().min(1),
+    /** Base d'URL du lien magique (le cœur possède l'uid d'interaction, §14.2). */
+    linkBase: z.string().optional(),
   })
   .merge(webauthnRpSchema)
 export const authStartMfaResultSchema = z.object({

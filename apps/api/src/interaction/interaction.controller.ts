@@ -258,7 +258,7 @@ export class InteractionController {
       const mfaInfo = await this.mfa.getMethods(account.sub, clientId)
       if (mfaInfo.required && mfaInfo.methods.length > 0) {
         const method = mfaInfo.methods[0] // choix par défaut ; l'UI pourrait proposer une sélection
-        const challenge = await this.mfa.start(account.sub, method.id)
+        const challenge = await this.mfa.start(account.sub, method.id, uid)
         if (challenge) {
           return interaction.finished(
             {
@@ -409,6 +409,45 @@ export class InteractionController {
     }
 
     res.render('pages/logout-success', { clientDisplay: null })
+  }
+
+  // Consommation d'un lien magique (cliqué depuis l'email). Même navigateur que
+  // l'interaction (cookie de session requis). Le jeton est vérifié par le connecteur.
+  @Get(':uid/magic')
+  public async magicLink(
+    @OidcInteraction() interaction: InteractionHelper,
+    @Query('token') token: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const renderError = () =>
+      res.status(400).render('pages/error', {
+        error: { error: 'invalid_request', error_description: 'Lien de connexion invalide ou expiré.' },
+      })
+    try {
+      const { lastSubmission, params } = await interaction.details()
+      const pendingMfa = lastSubmission && (lastSubmission as any).mfa
+      if (!pendingMfa || pendingMfa.type !== 'magic_link' || !token) return renderError()
+
+      const valid = await this.mfa.verify(pendingMfa.subject, pendingMfa.methodId, pendingMfa.challengeId, token)
+      const clientId = String((params as any).client_id ?? '')
+      if (!valid) {
+        this.audit.mfaFailure(pendingMfa.subject, 'magic_link', clientId)
+        return renderError()
+      }
+      this.audit.mfaSuccess(pendingMfa.subject, 'magic_link', clientId)
+      return interaction.finished(
+        {
+          login: {
+            accountId: pendingMfa.subject,
+            acr: 'urn:cartulaire:loa:2',
+            amr: ['pwd', 'otp', 'mfa'],
+          },
+        },
+        { mergeWithLastSubmission: false },
+      )
+    } catch {
+      return renderError()
+    }
   }
 
   @Get(':uid/abort')
