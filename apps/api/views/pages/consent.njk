@@ -24,6 +24,7 @@
       </div>
 
       <form action="/interaction/{{ uid }}/confirm" method="POST" autocomplete="off" class="mt-8 space-y-6">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
         {# Carte application #}
         <div class="rounded-2xl glass-field px-5 py-4">
           <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500">Application</p>

@@ -30,6 +30,7 @@
     </div>
     {% elif mfa.type == 'webauthn' %}
     <form id="wa-form" action="/interaction/{{ uid }}" method="POST">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
       <input type="hidden" name="response" />
     </form>
     <script type="application/json" id="wa-options">{"publicKey": {{ mfa.options | dump | safe }}}</script>
@@ -43,6 +44,7 @@
     <script src="/js/webauthn.js"></script>
     {% else %}
     <form action="/interaction/{{ uid }}" method="POST" autocomplete="off" class="space-y-5">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
       <div>
         <label for="code" class="block text-[13px] font-medium text-zinc-400 mb-2">Code de vérification</label>
         <input type="text" name="code" id="code" inputmode="numeric" autocomplete="one-time-code"

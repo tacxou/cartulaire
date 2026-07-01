@@ -40,6 +40,7 @@
           <li class="flex items-center justify-between rounded-2xl glass-field px-4 py-3">
             <span class="text-[15px] text-zinc-200">{{ m.label }} <span class="text-zinc-500 text-[13px]">({{ m.type }})</span></span>
             <form action="/account/mfa/remove" method="POST">
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
               <input type="hidden" name="methodId" value="{{ m.id }}" />
               <button type="submit" class="text-[13px] text-red-300 hover:text-red-200 transition">Retirer</button>
             </form>
@@ -60,6 +61,7 @@
         {% endif %}
         <p class="text-[13px] text-zinc-400 mb-3">{{ enrollment.hint }}</p>
         <form action="/account/mfa/confirm" method="POST" class="flex gap-3">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
           <input type="hidden" name="type" value="{{ enrollment.type }}" />
           <input type="hidden" name="challengeId" value="{{ enrollment.challengeId }}" />
           <input type="text" name="code" inputmode="numeric" required autofocus placeholder="Code"
@@ -70,6 +72,7 @@
       {% else %}
       <div class="flex flex-wrap gap-3">
         <form action="/account/mfa/enroll" method="POST" class="flex flex-wrap gap-3">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
           <button type="submit" name="type" value="totp"
             class="btn-primary rounded-full px-5 py-2.5 text-[14px]">Ajouter une app TOTP</button>
           <button type="submit" name="type" value="email_otp"
@@ -83,5 +86,6 @@
 
   </div>
 </div>
+<meta name="csrf-token" content="{{ csrfToken }}" />
 <script src="/js/webauthn.js"></script>
 {% endblock %}

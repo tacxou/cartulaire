@@ -37,6 +37,7 @@
       {% endif %}
 
       <form action="/interaction/{{ uid }}" method="POST" autocomplete="off" class="space-y-5">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
         <div>
           <label for="username" class="block text-[13px] font-medium text-zinc-400 mb-2">Identifiant</label>
           <input type="text" name="username" id="username" value="{{ form.username | default('') }}" required

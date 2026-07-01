@@ -84,6 +84,14 @@ declare const module: any
     app.use('/oidc/me', rateLimit({ name: 'userinfo', limiter: oauthLimiter, trustProxy: tp, json: true }))
   }
 
+  // Protection CSRF des formulaires (login, MFA, consentement, compte) — SPEC §25.
+  {
+    const { csrfProtection } = await import('./_common/_csrf/csrf')
+    const csrf = csrfProtection({ secure: cfg.oidc.isProduction })
+    app.use('/interaction', csrf)
+    app.use('/account', csrf)
+  }
+
   swagger(app)
 
   const port = cfg.oidc.port ?? 9000

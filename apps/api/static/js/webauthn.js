@@ -20,11 +20,16 @@
     return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
   }
 
+  function csrfToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]')
+    return meta ? meta.getAttribute('content') : ''
+  }
+
   /** Enrôle une nouvelle passkey (cérémonie d'attestation). */
   async function register() {
     const start = await fetch('/account/mfa/webauthn/start', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', 'x-csrf-token': csrfToken() },
       body: '{}',
     }).then((r) => r.json())
 
@@ -45,7 +50,7 @@
     }
     const res = await fetch('/account/mfa/webauthn/finish', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', 'x-csrf-token': csrfToken() },
       body: JSON.stringify({ challengeId: start.challengeId, response: response }),
     }).then((r) => r.json())
 
