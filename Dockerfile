@@ -1,18 +1,15 @@
-ARG CONTAINER_VERSION=alpine
-FROM oven/bun:${CONTAINER_VERSION} as builder
+ARG NODE_VERSION=22-alpine
+FROM node:${NODE_VERSION} as builder
 
 WORKDIR /usr/src/app
 
 COPY . .
 
-RUN bun install \
-  --prefer-offline \
-  --frozen-lockfile \
-  --non-interactive
+RUN corepack enable && yarn install --frozen-lockfile --non-interactive
 
-RUN bun run build
+RUN yarn build
 
-FROM oven/bun:${CONTAINER_VERSION} as production
+FROM node:${NODE_VERSION} as production
 
 ENV TIMEZONE=Europe/Paris \
   LANG=fr_FR.UTF-8
@@ -26,14 +23,10 @@ RUN apk add --no-cache tzdata && \
   ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
   echo "${TIMEZONE}" > /etc/timezone
 
-RUN bun install \
-  --prefer-offline \
-  --frozen-lockfile \
-  --non-interactive \
-  --production
+RUN corepack enable && yarn install --frozen-lockfile --non-interactive --production
 
 COPY --from=builder /usr/src/app/dist ./dist
 
 EXPOSE 4000
 
-CMD ["bun", "run", "start:prod"]
+CMD ["yarn", "start:prod"]

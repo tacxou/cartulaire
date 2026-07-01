@@ -14,10 +14,10 @@ help:
 	@awk 'BEGIN { FS = ":.*##"; } /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 dev: ## Start the project in development mode
-	@bun run start:dev
+	@yarn start:dev
 
 ncu: ## Check latest versions of all project dependencies
-	@bunx npm-check-updates
+	@npx npm-check-updates
 
 ncu-upgrade: ## Upgrade all project dependencies to the latest versions
-	@bunx npm-check-updates -u
+	@npx npm-check-updates -u
