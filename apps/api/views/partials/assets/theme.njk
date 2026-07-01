@@ -4,6 +4,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="{{ theme.fontGoogleUrl }}" rel="stylesheet" />
 {% endif %}
-<style id="cartulaire-theme-{{ theme.id }}">
+<style id="cartulaire-theme-{{ theme.id }}" nonce="{{ cspNonce }}">
 {{ theme.styles | safe }}
 </style>

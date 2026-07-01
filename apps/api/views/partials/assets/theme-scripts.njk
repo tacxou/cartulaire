@@ -1,8 +1,8 @@
 {# JS optionnel du thème actif — global puis page #}
 {% if theme.scripts.global %}
-<script id="theme-js-{{ theme.id }}">{{ theme.scripts.global | safe }}</script>
+<script id="theme-js-{{ theme.id }}" nonce="{{ cspNonce }}">{{ theme.scripts.global | safe }}</script>
 {% endif %}
 {% if theme.scripts.page %}
-<script id="theme-page-js-{{ theme.id }}">{{ theme.scripts.page | safe }}</script>
+<script id="theme-page-js-{{ theme.id }}" nonce="{{ cspNonce }}">{{ theme.scripts.page | safe }}</script>
 {% endif %}
 {% block theme_scripts %}{% endblock %}

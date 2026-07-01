@@ -5,6 +5,7 @@ node_modules/
 dist/
 .output/
 *.tsbuildinfo
+apps/api/static/assets/tailwind.css
 
 # turbo
 .turbo/

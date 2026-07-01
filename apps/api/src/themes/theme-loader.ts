@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import * as nunjucks from 'nunjucks'
+import { renderIcon } from '../_common/_functions/render-icon'
 
 export interface ThemeLoaderOptions {
   viewsPath: string
@@ -105,6 +106,7 @@ export function createThemeNunjucksEnvironment(
     noCache: options.noCache,
     watch: false,
   })
+  env.addGlobal('icon', renderIcon)
   return { env, loader }
 }
 

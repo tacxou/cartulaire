@@ -14,7 +14,7 @@
           style="background: rgba(6,6,14,.75); backdrop-filter: blur(20px);">
     <div class="flex items-center gap-3">
       <div class="brand-icon w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0">
-        <iconify-icon icon="carbon:security" width="18" height="18" class="text-white" aria-hidden="true"></iconify-icon>
+        {{ icon('shield-check', {width: 18, height: 18, class: 'text-white'}) }}
       </div>
       <span class="text-[15px] font-extrabold text-[#f5f3ff] tracking-[2px] uppercase">{{ branding.appName }}</span>
       <span class="status-pill hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-[.5px] uppercase">
@@ -32,7 +32,7 @@
       <a href="/login"
          class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-all"
          style="background: linear-gradient(135deg,#7c3aed,#5b21b6); border: 1px solid rgba(139,92,246,.35); box-shadow: 0 2px 16px rgba(124,58,237,.3);">
-        <iconify-icon icon="carbon:login" width="14" height="14" aria-hidden="true"></iconify-icon>
+        {{ icon('log-in', {width: 14, height: 14}) }}
         Connexion
       </a>
     </nav>
@@ -42,7 +42,7 @@
     <section class="text-center pt-10 sm:pt-14 pb-10">
       <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-semibold text-[#a78bfa] tracking-[.6px] uppercase mb-7"
            style="background: rgba(124,58,237,.09); border: 1px solid rgba(124,58,237,.2);">
-        <iconify-icon icon="carbon:security" width="11" height="11" aria-hidden="true"></iconify-icon>
+        {{ icon('shield-check', {width: 11, height: 11}) }}
         Serveur d'identité OIDC ·
       </div>
 
@@ -58,7 +58,7 @@
 
     <section class="mb-5">
       <div class="flex items-center gap-2.5 mb-5">
-        <iconify-icon icon="carbon:grid" width="13" height="13" style="color: #7c3aed" aria-hidden="true"></iconify-icon>
+        {{ icon('layout-grid', {width: 13, height: 13, style: 'color: #7c3aed'}) }}
         <span class="text-[11px] font-bold text-[#5b4f8a] tracking-[1px] uppercase">Applications disponibles</span>
         <span class="ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
               style="background: rgba(124,58,237,.15); color: #a78bfa; border: 1px solid rgba(124,58,237,.25);">7</span>
@@ -69,7 +69,7 @@
           <div class="flex items-start justify-between mb-4">
             <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
                  style="background: linear-gradient(145deg,#0ea5e9,#0369a1); box-shadow: 0 4px 14px rgba(14,165,233,.2);">
-              <iconify-icon icon="carbon:email" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+              {{ icon('mail', {width: 22, height: 22, class: 'text-white'}) }}
             </div>
             <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
           </div>
@@ -79,7 +79,7 @@
           <div class="h-px bg-white/[.06] mb-3.5"></div>
           <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
-              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>89
+              {{ icon('user', {width: 11, height: 11}) }}89
             </span>
             <a href="/auth?client=messagerie"
                class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
@@ -91,7 +91,7 @@
           <div class="flex items-start justify-between mb-4">
             <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
                  style="background: linear-gradient(145deg,#10b981,#047857); box-shadow: 0 4px 14px rgba(16,185,129,.2);">
-              <iconify-icon icon="carbon:calendar" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+              {{ icon('calendar', {width: 22, height: 22, class: 'text-white'}) }}
             </div>
             <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
           </div>
@@ -101,7 +101,7 @@
           <div class="h-px bg-white/[.06] mb-3.5"></div>
           <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
-              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>64
+              {{ icon('user', {width: 11, height: 11}) }}64
             </span>
             <a href="/auth?client=calendrier"
                class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
@@ -113,7 +113,7 @@
           <div class="flex items-start justify-between mb-4">
             <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
                  style="background: linear-gradient(145deg,#f59e0b,#b45309); box-shadow: 0 4px 14px rgba(245,158,11,.2);">
-              <iconify-icon icon="carbon:document" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+              {{ icon('file-text', {width: 22, height: 22, class: 'text-white'}) }}
             </div>
             <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
           </div>
@@ -123,7 +123,7 @@
           <div class="h-px bg-white/[.06] mb-3.5"></div>
           <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
-              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>117
+              {{ icon('user', {width: 11, height: 11}) }}117
             </span>
             <a href="/auth?client=documents"
                class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
@@ -135,7 +135,7 @@
           <div class="flex items-start justify-between mb-4">
             <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
                  style="background: linear-gradient(145deg,#ec4899,#9d174d); box-shadow: 0 4px 14px rgba(236,72,153,.2);">
-              <iconify-icon icon="carbon:group" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+              {{ icon('users', {width: 22, height: 22, class: 'text-white'}) }}
             </div>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full mt-0.5"
                   style="background: rgba(236,72,153,.1); color: #f9a8d4; border: 1px solid rgba(236,72,153,.25);">RH</span>
@@ -146,7 +146,7 @@
           <div class="h-px bg-white/[.06] mb-3.5"></div>
           <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
-              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>38
+              {{ icon('user', {width: 11, height: 11}) }}38
             </span>
             <a href="/auth?client=rh"
                class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
@@ -158,7 +158,7 @@
           <div class="flex items-start justify-between mb-4">
             <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
                  style="background: linear-gradient(145deg,#6366f1,#4338ca); box-shadow: 0 4px 14px rgba(99,102,241,.2);">
-              <iconify-icon icon="carbon:book" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+              {{ icon('book', {width: 22, height: 22, class: 'text-white'}) }}
             </div>
             <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
           </div>
@@ -168,7 +168,7 @@
           <div class="h-px bg-white/[.06] mb-3.5"></div>
           <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
-              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>142
+              {{ icon('user', {width: 11, height: 11}) }}142
             </span>
             <a href="/auth?client=wiki"
                class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
@@ -180,7 +180,7 @@
           <div class="flex items-start justify-between mb-4">
             <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
                  style="background: linear-gradient(145deg,#14b8a6,#0f766e); box-shadow: 0 4px 14px rgba(20,184,166,.2);">
-              <iconify-icon icon="carbon:chart-line" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+              {{ icon('line-chart', {width: 22, height: 22, class: 'text-white'}) }}
             </div>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full mt-0.5"
                   style="background: rgba(20,184,166,.1); color: #5eead4; border: 1px solid rgba(20,184,166,.25);">Infra</span>
@@ -191,7 +191,7 @@
           <div class="h-px bg-white/[.06] mb-3.5"></div>
           <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
-              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>12
+              {{ icon('user', {width: 11, height: 11}) }}12
             </span>
             <a href="/auth?client=supervision"
                class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
@@ -203,7 +203,7 @@
           <div class="flex items-start justify-between mb-4">
             <div class="w-12 h-12 rounded-[14px] flex items-center justify-center"
                  style="background: linear-gradient(145deg,#8b5cf6,#5b21b6); box-shadow: 0 4px 14px rgba(139,92,246,.2);">
-              <iconify-icon icon="carbon:radar" width="22" height="22" class="text-white" aria-hidden="true"></iconify-icon>
+              {{ icon('radar', {width: 22, height: 22, class: 'text-white'}) }}
             </div>
             <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1"></span>
           </div>
@@ -213,7 +213,7 @@
           <div class="h-px bg-white/[.06] mb-3.5"></div>
           <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
-              <iconify-icon icon="carbon:user" width="11" height="11" aria-hidden="true"></iconify-icon>55
+              {{ icon('user', {width: 11, height: 11}) }}55
             </span>
             <a href="/auth?client=helpdesk"
                class="text-[11px] font-semibold text-white px-3.5 py-1.5 rounded-[9px] transition-all"
@@ -224,7 +224,7 @@
         <div class="glass rounded-2xl p-5 opacity-50 cursor-not-allowed select-none">
           <div class="flex items-start justify-between mb-4">
             <div class="w-12 h-12 rounded-[14px] flex items-center justify-center bg-white/5">
-              <iconify-icon icon="carbon:dashboard" width="22" height="22" style="color: #555" aria-hidden="true"></iconify-icon>
+              {{ icon('layout-dashboard', {width: 22, height: 22, style: 'color: #555'}) }}
             </div>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full mt-0.5"
                   style="background: rgba(107,114,128,.12); color: #6b7280; border: 1px solid rgba(107,114,128,.2);">Bientôt</span>
@@ -260,7 +260,7 @@
       <div class="relative z-10 flex flex-col lg:flex-row items-stretch lg:items-center gap-8 p-7 sm:p-9">
         <div class="w-16 h-16 rounded-[18px] flex items-center justify-center shrink-0 mx-auto lg:mx-0"
              style="background: linear-gradient(145deg,#7c3aed,#4c1d95); box-shadow: 0 0 0 1px rgba(124,58,237,.35), 0 8px 32px rgba(124,58,237,.35);">
-          <iconify-icon icon="carbon:security" width="30" height="30" class="text-white" aria-hidden="true"></iconify-icon>
+          {{ icon('shield-check', {width: 30, height: 30, class: 'text-white'}) }}
         </div>
 
         <div class="flex-1 text-center lg:text-left">
@@ -274,13 +274,13 @@
           </p>
           <div class="flex flex-wrap items-center justify-center lg:justify-start gap-5 mt-3">
             <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
-              <iconify-icon icon="carbon:security" width="11" height="11" style="color: #7c3aed" aria-hidden="true"></iconify-icon>Chiffrement TLS
+              {{ icon('shield-check', {width: 11, height: 11, style: 'color: #7c3aed'}) }}Chiffrement TLS
             </span>
             <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
-              <iconify-icon icon="carbon:time" width="11" height="11" style="color: #7c3aed" aria-hidden="true"></iconify-icon>Session 8h
+              {{ icon('clock', {width: 11, height: 11, style: 'color: #7c3aed'}) }}Session 8h
             </span>
             <span class="flex items-center gap-1.5 text-[11px] text-[#4e4a6a]">
-              <iconify-icon icon="carbon:two-factor-authentication" width="11" height="11" style="color: #7c3aed" aria-hidden="true"></iconify-icon>MFA disponible
+              {{ icon('fingerprint', {width: 11, height: 11, style: 'color: #7c3aed'}) }}MFA disponible
             </span>
           </div>
         </div>
@@ -289,7 +289,7 @@
           <a href="/login"
              class="flex items-center justify-center gap-2 px-8 py-3.5 rounded-[13px] text-[14px] font-bold text-white transition-all"
              style="background: linear-gradient(135deg,#7c3aed,#5b21b6); border: 1px solid rgba(139,92,246,.35); box-shadow: 0 6px 28px rgba(124,58,237,.4);">
-            <iconify-icon icon="carbon:login" width="15" height="15" aria-hidden="true"></iconify-icon>
+            {{ icon('log-in', {width: 15, height: 15}) }}
             Se connecter
           </a>
           <a href="/register"
@@ -305,7 +305,7 @@
   <footer class="relative z-10 border-t border-white/[.05] px-6 sm:px-12 py-4 flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3">
     <div class="flex items-center gap-2">
       <div class="brand-icon w-6 h-6 rounded-[6px] flex items-center justify-center">
-        <iconify-icon icon="carbon:security" width="12" height="12" class="text-white" aria-hidden="true"></iconify-icon>
+        {{ icon('shield-check', {width: 12, height: 12, class: 'text-white'}) }}
       </div>
       <span class="text-[11px] font-bold text-[#2a2742] tracking-[1.5px] uppercase">{{ branding.appName }}</span>
     </div>

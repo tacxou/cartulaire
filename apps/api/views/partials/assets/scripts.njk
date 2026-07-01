@@ -1,2 +1,4 @@
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-<script src="https://code.iconify.design/iconify-icon/2/iconify-icon.min.js"></script>
+{# Anciennement : Tailwind (CDN JIT) + iconify-icon (CDN). Remplacés par un build
+   Tailwind local (partials/assets/head.njk) et des icônes SVG inline rendues
+   côté serveur (icon() — apps/api/src/_common/_functions/render-icon.ts),
+   pour respecter le CSP strict et l'interdiction de CDN externe (§5, §24.4). #}

@@ -15,7 +15,7 @@
           style="background: rgba(8,6,18,.8); backdrop-filter: blur(20px);">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 rounded-xl flex items-center justify-center aurora-cta">
-        <iconify-icon icon="carbon:cloud" width="18" height="18" class="text-white" aria-hidden="true"></iconify-icon>
+        {{ icon('cloud', {width: 18, height: 18, class: 'text-white'}) }}
       </div>
       <span class="text-[15px] font-bold text-cyan-50 tracking-wide">{{ branding.appName }}</span>
       <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide uppercase badge-accent">
@@ -25,7 +25,7 @@
     </div>
     <a href="/login"
        class="aurora-cta flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-all">
-      <iconify-icon icon="carbon:login" width="14" height="14" aria-hidden="true"></iconify-icon>
+      {{ icon('log-in', {width: 14, height: 14}) }}
       Connexion
     </a>
   </header>
@@ -33,7 +33,7 @@
   <main class="relative z-10 flex-1 max-w-[900px] w-full mx-auto px-6 sm:px-12 py-12 sm:py-16">
     <section class="text-center">
       <p class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-semibold tracking-wide uppercase mb-8 badge-accent">
-        <iconify-icon icon="carbon:cloud-lightning" width="11" height="11" aria-hidden="true"></iconify-icon>
+        {{ icon('cloud-lightning', {width: 11, height: 11}) }}
         Serveur d'identité
       </p>
 
@@ -48,19 +48,19 @@
 
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-14">
       <div class="aurora-card-mini rounded-2xl p-5">
-        <iconify-icon icon="carbon:email" width="28" height="28" class="text-cyan-400 mb-3" aria-hidden="true"></iconify-icon>
+        {{ icon('mail', {width: 28, height: 28, class: 'text-cyan-400 mb-3'}) }}
         <div class="text-[14px] font-bold text-zinc-100 mb-1">Messagerie</div>
         <div class="text-[12px] text-zinc-500 mb-4">Courrier et notifications</div>
         <a href="/auth?client=messagerie" class="text-[12px] font-semibold link-accent">Accéder →</a>
       </div>
       <div class="aurora-card-mini rounded-2xl p-5">
-        <iconify-icon icon="carbon:calendar" width="28" height="28" class="text-purple-400 mb-3" aria-hidden="true"></iconify-icon>
+        {{ icon('calendar', {width: 28, height: 28, class: 'text-purple-400 mb-3'}) }}
         <div class="text-[14px] font-bold text-zinc-100 mb-1">Calendrier</div>
         <div class="text-[12px] text-zinc-500 mb-4">Agenda partagé</div>
         <a href="/auth?client=calendrier" class="text-[12px] font-semibold link-accent">Accéder →</a>
       </div>
       <div class="aurora-card-mini rounded-2xl p-5">
-        <iconify-icon icon="carbon:document" width="28" height="28" class="text-emerald-400 mb-3" aria-hidden="true"></iconify-icon>
+        {{ icon('file-text', {width: 28, height: 28, class: 'text-emerald-400 mb-3'}) }}
         <div class="text-[14px] font-bold text-zinc-100 mb-1">Documents</div>
         <div class="text-[12px] text-zinc-500 mb-4">Fichiers et partage</div>
         <a href="/auth?client=documents" class="text-[12px] font-semibold link-accent">Accéder →</a>
@@ -75,7 +75,7 @@
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
         <a href="/login"
            class="aurora-cta inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl text-[14px] font-bold text-white w-full sm:w-auto">
-          <iconify-icon icon="carbon:login" width="15" height="15" aria-hidden="true"></iconify-icon>
+          {{ icon('log-in', {width: 15, height: 15}) }}
           Se connecter
         </a>
         <a href="/register"
