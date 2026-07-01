@@ -33,6 +33,10 @@ export const validationSchema = Joi.object({
     .uri({ scheme: ['redis', 'rediss'] })
     .default('redis://localhost:6379'),
   CARTULAIRE_REDIS_PASSWORD: Joi.string().allow('').optional(),
+
+  // WebAuthn / passkeys (§23) — contexte Relying Party transmis au connecteur.
+  CARTULAIRE_WEBAUTHN_RP_ID: Joi.string().default('localhost'),
+  CARTULAIRE_WEBAUTHN_ORIGIN: Joi.string().uri().default('http://localhost:9000'),
 })
 
 export interface ConfigInstance {
@@ -62,6 +66,11 @@ export interface ConfigInstance {
     secret: string
     identityAudience: string
     timeoutMs: number
+  }
+
+  webauthn: {
+    rpId: string
+    origin: string
   }
 
   swagger: {
@@ -118,6 +127,11 @@ export default async (): Promise<ConfigInstance> => {
       secret: process.env['CARTULAIRE_API_DAEMON_SECRET']!,
       identityAudience: process.env['CARTULAIRE_IDENTITY_AUDIENCE']!,
       timeoutMs: parseInt(process.env['CARTULAIRE_DAEMON_TIMEOUT_MS'] ?? '5000', 10),
+    },
+
+    webauthn: {
+      rpId: process.env['CARTULAIRE_WEBAUTHN_RP_ID']!,
+      origin: process.env['CARTULAIRE_WEBAUTHN_ORIGIN']!,
     },
 
     swagger: {

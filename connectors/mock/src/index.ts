@@ -84,17 +84,17 @@ const commands = [
   }),
 
   defineCommand(COMMANDS.AUTH_START_MFA, (payload) => {
-    const { subject, methodId } = authStartMfaPayloadSchema.parse(payload)
+    const { subject, methodId, rpId, origin } = authStartMfaPayloadSchema.parse(payload)
     try {
-      return startMfa(subject, methodId)
+      return startMfa(subject, methodId, { rpId, origin })
     } catch {
       throw new CommandFailure(ERROR_CODES.VALIDATION_ERROR, 'unknown mfa method', 'Une erreur est survenue.')
     }
   }),
 
   defineCommand(COMMANDS.AUTH_VERIFY_MFA, (payload) => {
-    const { subject, methodId, challengeId, code } = authVerifyMfaPayloadSchema.parse(payload)
-    const valid = verifyMfa(subject, methodId, challengeId, code)
+    const { subject, methodId, challengeId, code, response } = authVerifyMfaPayloadSchema.parse(payload)
+    const valid = verifyMfa(subject, methodId, challengeId, code, { response })
     if (!valid) {
       throw new CommandFailure(ERROR_CODES.MFA_INVALID, 'invalid mfa response', 'Code invalide.')
     }
@@ -103,8 +103,9 @@ const commands = [
 
   defineCommand(COMMANDS.AUTH_REGISTER_MFA, (payload) => {
     const p = authRegisterMfaPayloadSchema.parse(payload)
-    if (p.phase === 'start') return registerStart(p.subject, p.type, p.label)
-    const res = registerConfirm(p.subject, p.challengeId ?? '', p.code)
+    const ctx = { rpId: p.rpId, origin: p.origin, userName: p.userName, response: p.response }
+    if (p.phase === 'start') return registerStart(p.subject, p.type, p.label, ctx)
+    const res = registerConfirm(p.subject, p.challengeId ?? '', p.code, p.type, ctx)
     if (!res.registered) {
       throw new CommandFailure(ERROR_CODES.MFA_INVALID, 'enrollment failed', 'Code invalide.')
     }

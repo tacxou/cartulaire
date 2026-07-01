@@ -18,6 +18,20 @@
     </div>
     {% endif %}
 
+    {% if mfa.type == 'webauthn' %}
+    <form id="wa-form" action="/interaction/{{ uid }}" method="POST">
+      <input type="hidden" name="response" />
+    </form>
+    <script type="application/json" id="wa-options">{"publicKey": {{ mfa.options | dump | safe }}}</script>
+    <button type="button" data-webauthn-authenticate
+      class="btn-primary w-full rounded-full px-4 py-3.5 text-[15px] transition active:scale-[0.99]">
+      Utiliser ma passkey
+    </button>
+    <p class="text-center text-[13px] text-zinc-500 pt-4">
+      <a href="/interaction/{{ uid }}/abort" class="link-accent font-medium transition">Annuler</a>
+    </p>
+    <script src="/js/webauthn.js"></script>
+    {% else %}
     <form action="/interaction/{{ uid }}" method="POST" autocomplete="off" class="space-y-5">
       <div>
         <label for="code" class="block text-[13px] font-medium text-zinc-400 mb-2">Code de vérification</label>
@@ -35,6 +49,7 @@
         <a href="/interaction/{{ uid }}/abort" class="link-accent font-medium transition">Annuler</a>
       </p>
     </form>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

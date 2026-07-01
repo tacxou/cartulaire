@@ -10,7 +10,7 @@ import type { PackageJson } from 'types-package-json'
 import config from './config'
 import swagger from './swagger'
 import { AppModule } from './app.module'
-import { urlencoded } from 'body-parser'
+import { json, urlencoded } from 'body-parser'
 import { createThemeNunjucksEnvironment } from './themes/theme-loader'
 import { ThemesService } from './themes/themes.service'
 
@@ -70,6 +70,7 @@ declare const module: any
 
   app.use('/interaction', urlencoded({ extended: false }))
   app.use('/account', urlencoded({ extended: false }))
+  app.use('/account', json()) // endpoints WebAuthn (start/finish) en JSON
   swagger(app)
 
   const port = cfg.oidc.port ?? 9000

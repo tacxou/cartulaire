@@ -189,11 +189,22 @@ export class InteractionController {
       // défi) est conservé côté serveur dans `lastSubmission.mfa`.
       const pendingMfa = lastSubmission && (lastSubmission as any).mfa
       if (pendingMfa) {
+        // WebAuthn : le client soumet l'assertion JSON dans `response` ; les
+        // autres facteurs soumettent un `code`.
+        let waResponse: Record<string, unknown> | undefined
+        if (form.response) {
+          try {
+            waResponse = JSON.parse(form.response)
+          } catch {
+            waResponse = undefined
+          }
+        }
         const valid = await this.mfa.verify(
           pendingMfa.subject,
           pendingMfa.methodId,
           pendingMfa.challengeId,
           form.code,
+          waResponse,
         )
         if (!valid) {
           this.audit.mfaFailure(pendingMfa.subject, pendingMfa.type, clientId)
@@ -257,6 +268,8 @@ export class InteractionController {
                 type: method.type,
                 challengeId: challenge.challengeId,
                 hint: challenge.hint,
+                // Options WebAuthn (challenge/allowCredentials) pour navigator.credentials.get.
+                options: (challenge as { data?: { publicKey?: unknown } }).data?.publicKey,
               },
             },
             { mergeWithLastSubmission: false },

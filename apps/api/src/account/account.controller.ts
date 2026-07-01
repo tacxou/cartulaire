@@ -75,6 +75,28 @@ export class AccountController {
     })
   }
 
+  // ── WebAuthn / passkeys (JSON, pilotés par le client webauthn.js) ──────────
+  @Post('mfa/webauthn/start')
+  async webauthnStart(@OidcSession() session: OidcSessionLike, @Res() res: Response): Promise<void> {
+    const sub = session?.accountId
+    if (!sub) return void res.status(401).json({ error: 'unauthenticated' })
+    const opts = await this.mfa.registerStart(sub, 'webauthn', undefined, sub)
+    if (!opts) return void res.status(502).json({ error: 'start_failed' })
+    return void res.json({ challengeId: opts.challengeId, publicKey: opts.data?.['publicKey'] })
+  }
+
+  @Post('mfa/webauthn/finish')
+  async webauthnFinish(
+    @OidcSession() session: OidcSessionLike,
+    @Body() body: { challengeId?: string; response?: Record<string, unknown> },
+    @Res() res: Response,
+  ): Promise<void> {
+    const sub = session?.accountId
+    if (!sub) return void res.status(401).json({ error: 'unauthenticated' })
+    const ok = await this.mfa.registerConfirm(sub, 'webauthn', body.challengeId ?? '', undefined, body.response)
+    return void res.json({ registered: ok })
+  }
+
   @Post('mfa/remove')
   async remove(
     @OidcSession() session: OidcSessionLike,

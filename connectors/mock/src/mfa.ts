@@ -1,4 +1,20 @@
 import { createHmac, randomBytes, randomInt, randomUUID } from 'node:crypto'
+import {
+  webauthnAuthOptions,
+  webauthnAuthVerify,
+  webauthnDisable,
+  webauthnListMethods,
+  webauthnRegisterOptions,
+  webauthnRegisterVerify,
+} from './webauthn'
+
+/** Contexte Relying Party fourni par le cœur pour WebAuthn. */
+export interface WebauthnCtx {
+  rpId?: string
+  origin?: string
+  userName?: string
+  response?: Record<string, unknown>
+}
 
 /**
  * MFA côté connecteur (démo). C'est ICI que vit tout le savoir d'un facteur :
@@ -85,12 +101,17 @@ function userOf(subject: string): UserMfa | undefined {
 
 // ─── API utilisée par les handlers de commandes ─────────────────────────────
 export function getMfaMethods(subject: string): { required: boolean; methods: Array<{ id: string; type: MfaMethodType; label: string }> } {
-  const u = userOf(subject)
-  if (!u) return { required: false, methods: [] }
-  return { required: u.required, methods: u.methods.map(({ id, type, label }) => ({ id, type, label })) }
+  const base = (userOf(subject)?.methods ?? []).map(({ id, type, label }) => ({ id, type, label }))
+  const methods = [...base, ...webauthnListMethods(subject)]
+  return { required: methods.length > 0, methods }
 }
 
-export function startMfa(subject: string, methodId: string) {
+export function startMfa(subject: string, methodId: string, ctx: WebauthnCtx = {}) {
+  // WebAuthn : défi d'authentification (assertion), piloté par le navigateur.
+  if (methodId.startsWith('webauthn')) {
+    return webauthnAuthOptions(subject, ctx.rpId ?? 'localhost', ctx.origin ?? 'http://localhost')
+  }
+
   const u = userOf(subject)
   const method = u?.methods.find((m) => m.id === methodId)
   if (!method) throw new Error('unknown method')
@@ -161,7 +182,10 @@ function ensureUser(subject: string): UserMfa {
   return MFA_USERS[subject]
 }
 
-export function registerStart(subject: string, type: MfaMethodType, label?: string) {
+export function registerStart(subject: string, type: MfaMethodType, label?: string, ctx: WebauthnCtx = {}) {
+  if (type === 'webauthn') {
+    return webauthnRegisterOptions(subject, ctx.rpId ?? 'localhost', ctx.origin ?? 'http://localhost', ctx.userName ?? subject)
+  }
   const challengeId = `enr_${randomUUID()}`
   if (type === 'totp') {
     const secret = randomBytes(20)
@@ -181,7 +205,18 @@ export function registerStart(subject: string, type: MfaMethodType, label?: stri
   return { challengeId, type, hint: 'Enrôlement non encore supporté pour cette méthode.', data: { implemented: false } }
 }
 
-export function registerConfirm(subject: string, challengeId: string, code?: string) {
+export function registerConfirm(
+  subject: string,
+  challengeId: string,
+  code?: string,
+  type?: MfaMethodType,
+  ctx: WebauthnCtx = {},
+) {
+  if (type === 'webauthn') {
+    return ctx.response
+      ? webauthnRegisterVerify(subject, challengeId, ctx.response)
+      : { registered: false }
+  }
   const enr = enrollments.get(challengeId)
   if (!enr || enr.subject !== subject || !code) return { registered: false }
 
@@ -203,6 +238,7 @@ export function registerConfirm(subject: string, challengeId: string, code?: str
 }
 
 export function disableMfa(subject: string, methodId: string): boolean {
+  if (methodId.startsWith('webauthn')) return webauthnDisable(subject, methodId)
   const user = userOf(subject)
   if (!user) return false
   const before = user.methods.length
@@ -211,7 +247,18 @@ export function disableMfa(subject: string, methodId: string): boolean {
   return user.methods.length < before
 }
 
-export function verifyMfa(subject: string, methodId: string, challengeId: string, code?: string): boolean {
+export function verifyMfa(
+  subject: string,
+  methodId: string,
+  challengeId: string,
+  code?: string,
+  ctx: WebauthnCtx = {},
+): boolean {
+  // WebAuthn : vérification de l'assertion signée par la clé.
+  if (methodId.startsWith('webauthn')) {
+    return ctx.response ? webauthnAuthVerify(subject, challengeId, ctx.response) : false
+  }
+
   const ch = challenges.get(challengeId)
   if (!ch || ch.subject !== subject || ch.methodId !== methodId || ch.expiresAt < Date.now()) return false
 

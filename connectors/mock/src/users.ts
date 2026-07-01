@@ -29,6 +29,15 @@ export const MOCK_USERS: MockUser[] = [
     },
   },
   {
+    // Utilisateur sans MFA au départ — sert à démontrer l'enrôlement d'une passkey.
+    sub: 'user_bob',
+    username: 'bob',
+    email: 'bob@example.com',
+    password: 'bobpass',
+    groups: ['users'],
+    claims: { name: 'Bob', preferred_username: 'bob', email: 'bob@example.com', email_verified: true },
+  },
+  {
     sub: 'user_alice',
     username: 'alice',
     email: 'alice@example.com',

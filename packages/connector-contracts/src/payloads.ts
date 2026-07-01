@@ -54,11 +54,20 @@ export const authGetMfaMethodsResultSchema = z.object({
   methods: z.array(mfaMethodSchema),
 })
 
-// auth.startMfa — initie un défi pour une méthode (envoi OTP, options WebAuthn…)
-export const authStartMfaPayloadSchema = z.object({
-  subject: z.string().min(1),
-  methodId: z.string().min(1),
+// Contexte WebAuthn (Relying Party) transmis par le cœur au connecteur.
+// Le cœur possède l'origine/rpId ; le connecteur possède les credentials.
+const webauthnRpSchema = z.object({
+  rpId: z.string().optional(),
+  origin: z.string().optional(),
 })
+
+// auth.startMfa — initie un défi pour une méthode (envoi OTP, options WebAuthn…)
+export const authStartMfaPayloadSchema = z
+  .object({
+    subject: z.string().min(1),
+    methodId: z.string().min(1),
+  })
+  .merge(webauthnRpSchema)
 export const authStartMfaResultSchema = z.object({
   /** Identifiant du défi, à repasser à verifyMfa (anti-rejeu, corrélation). */
   challengeId: z.string().min(1),
@@ -84,17 +93,21 @@ export const authVerifyMfaResultSchema = z.object({
 })
 
 // auth.registerMfa — enrôlement d'un facteur, en deux phases (§14.2, §23)
-export const authRegisterMfaPayloadSchema = z.object({
-  subject: z.string().min(1),
-  type: z.enum(MFA_METHOD_TYPES),
-  /** `start` initie l'enrôlement ; `confirm` le valide avec un code/réponse. */
-  phase: z.enum(['start', 'confirm']),
-  /** Libellé/destination pour start (email, n° masqué, nom de clé…). */
-  label: z.string().optional(),
-  challengeId: z.string().optional(),
-  code: z.string().optional(),
-  response: z.record(z.unknown()).optional(),
-})
+export const authRegisterMfaPayloadSchema = z
+  .object({
+    subject: z.string().min(1),
+    type: z.enum(MFA_METHOD_TYPES),
+    /** `start` initie l'enrôlement ; `confirm` le valide avec un code/réponse. */
+    phase: z.enum(['start', 'confirm']),
+    /** Libellé/destination pour start (email, n° masqué, nom de clé…). */
+    label: z.string().optional(),
+    /** Nom d'utilisateur affiché (WebAuthn user.name). */
+    userName: z.string().optional(),
+    challengeId: z.string().optional(),
+    code: z.string().optional(),
+    response: z.record(z.unknown()).optional(),
+  })
+  .merge(webauthnRpSchema)
 export const authRegisterMfaResultSchema = z.object({
   challengeId: z.string().optional(),
   /** Secret TOTP (base32) + URI otpauth à présenter/scanner, phase start. */

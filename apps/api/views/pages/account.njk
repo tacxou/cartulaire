@@ -68,15 +68,20 @@
         </form>
       </section>
       {% else %}
-      <form action="/account/mfa/enroll" method="POST" class="flex flex-wrap gap-3">
-        <button type="submit" name="type" value="totp"
-          class="btn-primary rounded-full px-5 py-2.5 text-[14px]">Ajouter une app TOTP</button>
-        <button type="submit" name="type" value="email_otp"
-          class="rounded-full px-5 py-2.5 text-[14px] glass-field text-zinc-200 hover:text-white transition">Ajouter un code email</button>
-      </form>
+      <div class="flex flex-wrap gap-3">
+        <form action="/account/mfa/enroll" method="POST" class="flex flex-wrap gap-3">
+          <button type="submit" name="type" value="totp"
+            class="btn-primary rounded-full px-5 py-2.5 text-[14px]">Ajouter une app TOTP</button>
+          <button type="submit" name="type" value="email_otp"
+            class="rounded-full px-5 py-2.5 text-[14px] glass-field text-zinc-200 hover:text-white transition">Ajouter un code email</button>
+        </form>
+        <button type="button" data-webauthn-register
+          class="rounded-full px-5 py-2.5 text-[14px] glass-field text-zinc-200 hover:text-white transition">Ajouter une passkey</button>
+      </div>
       {% endif %}
     {% endif %}
 
   </div>
 </div>
+<script src="/js/webauthn.js"></script>
 {% endblock %}
