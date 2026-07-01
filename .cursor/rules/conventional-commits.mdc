@@ -1,0 +1,46 @@
+---
+description: Messages de commit Conventional Commits (Cartulaire)
+alwaysApply: true
+---
+
+# Conventional Commits
+
+Référence complète : `docs/conventions/conventional-commits.md`.
+
+## Format obligatoire
+
+```
+<type>(<scope>): <description impérative en anglais, ≤ 72 car., sans point final>
+```
+
+Types : `feat` · `fix` · `docs` · `style` · `refactor` · `perf` · `test` · `build` · `ci` · `chore` · `revert`
+
+Scopes : `api` · `daemon` · `web` · `core` · `connector-contracts` · `connector-sdk` · `crypto` · `config` · `logger` · `connectors` · `deps` · `docker` · `ci` · `root` (ou omis si transversal)
+
+Breaking : `type(scope)!:` ou pied `BREAKING CHANGE:`.
+
+## SemVer stricte
+
+Versions `MAJOR.MINOR.PATCH` uniquement ([SemVer 2.0.0](https://semver.org/)). Bump : `fix` → PATCH, `feat` → MINOR, breaking → MAJOR ; `docs`/`chore`/… → aucun bump. Signaler le bump attendu si pertinent.
+
+## Enforcement Git
+
+Hook Husky `commit-msg` + commitlint — messages non conformes **rejetés**.
+
+- **Bouton Generate Commit Message** (SCM) : lit `.cursorrules` à la racine.
+- **Chat / Agent** : cette règle + commande `/commit-message`.
+- Config commitlint : `commitlint.config.js` — `scope-enum` strict.
+
+## Comportement agent
+
+- Proposer le message ; ne pas committer/pousser sans demande explicite.
+- Un commit = une intention ; pas de `WIP` ni sujets vagues (`update`, `fix stuff`).
+- Corps optionnel pour le *pourquoi* ; pied `Refs: #N` / `Closes: #N` si issue liée.
+
+## Exemples
+
+```
+feat(api): add OIDC interaction consent page
+fix(daemon): enforce command signature expiry
+docs(root): add AI agent rules and commit conventions
+```

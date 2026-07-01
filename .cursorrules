@@ -1,0 +1,11 @@
+# Conventional Commits — Cartulaire
+
+Use Conventional Commits 1.0.0 as defined in docs/conventions/conventional-commits.md.
+
+Format: <type>(<scope>): <description>
+- English, imperative mood, subject ≤ 72 characters, no trailing period
+- Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+- Scopes (strict enum): api, daemon, web, core, connector-contracts, connector-sdk, crypto, config, logger, connectors, deps, docker, ci, root
+- Omit scope only if truly cross-cutting
+
+Do not commit or push automatically. Propose atomic messages only.

@@ -1,0 +1,29 @@
+---
+description: Architecture Cartulaire — cœur sans DB, OAuth/OIDC first
+alwaysApply: true
+---
+
+# Architecture Cartulaire
+
+Référence : `SPEC.md` §10 et §44. Charte complète : `CLAUDE.md`.
+
+## Règles non négociables
+
+1. **Aucun accès DB/ORM/LDAP** dans `apps/api` ou `packages/*` — données via daemon + connecteurs signés.
+2. **OAuth/OIDC avant CAS/SAML** — stabiliser le socle OIDC avant tout protocole legacy.
+3. **Pages auth en SSR** (Nunjucks + Tailwind) — pas de SPA lourde sur login/consent/MFA.
+4. **Commandes microservice** signées, horodatées, limitées dans le temps (`@cartulaire/connector-contracts`).
+5. **Secrets jamais en clair** dans le dépôt (`.env`, clés, tokens).
+6. **Scope npm interne** `@cartulaire/*` pour les packages partagés.
+7. **Diff minimal** — réutiliser `AbstractService`, adapters storage, fonctions `oidc-config/_functions/`.
+
+## Structure
+
+- `apps/api` — cœur HTTP public (OIDC, interaction, config YAML).
+- `apps/daemon` — pont vers `connectors/*`.
+- `connectors/*` — sources d'identité isolées et remplaçables.
+- `_common/` — briques transverses, **pas** un module Nest.
+
+## Interdit sans validation explicite
+
+Prisma, TypeORM, Mongoose, client LDAP, driver SQL/Redis métier dans le cœur.

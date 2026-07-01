@@ -1,0 +1,17 @@
+---
+description: Imports NestJS API/daemon — DI et DTO en import valeur, pas import type
+globs: apps/api/**/*,apps/daemon/**/*
+alwaysApply: false
+---
+
+# Imports `apps/api` et `apps/daemon` (NestJS)
+
+## Pourquoi
+
+NestJS s'appuie sur `emitDecoratorMetadata` : les classes injectées (`*Service` dans le constructeur) et les DTO passés à `@Body()` / `@Query()` doivent exister **au runtime**. Un `import type` les efface à la compilation et casse la DI ou `ValidationPipe`.
+
+## Règles
+
+- **Garder** `import { ClientsService }`, `import { CreateClientDto }`, etc. (import valeur).
+- **Utiliser** `import type` seulement pour de purs types sans décorateur ni métadonnées (ex. `Request`, interfaces internes).
+- Ne pas convertir services/DTO/modules Nest en `import type` sans vérifier le runtime.
