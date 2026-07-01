@@ -16,6 +16,7 @@ import { JwksService } from '~/jwks/jwks.service'
 import { StorageService } from '~/storage/storage.service'
 import { IdentityService } from '~/identity/identity.service'
 import { ConsentService } from '~/consent/consent.service'
+import { AuditService } from '~/audit/audit.service'
 import { introspectionAllowedPolicy } from './_functions/_features/introspection.function'
 import {
   resourceIndicatorsDefaultResource,
@@ -38,6 +39,7 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
     private readonly jwksService: JwksService,
     private readonly identityService: IdentityService,
     private readonly consentService: ConsentService,
+    private readonly auditService: AuditService,
     private readonly themesService: ThemesService,
   ) {}
 
@@ -122,6 +124,7 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
 
   public createAdapterFactory(): AdapterFactory | Promise<AdapterFactory> {
     const consent = this.consentService
+    const audit = this.auditService
     const logger = this.logger
     return (modelName: string) => {
       const adapter = new StorageService(modelName, this.dbService)
@@ -136,6 +139,7 @@ export class OidcConfigService implements OidcModuleOptionsFactory, OnModuleInit
             const session = (await adapter.find(id)) as { accountId?: string } | undefined
             if (session?.accountId) {
               await consent.revokeSession({ subject: String(session.accountId), sid: id })
+              audit.sessionRevoked(String(session.accountId), id)
             }
           } catch (e) {
             logger.warn(`session.revoke déléguée en échec: ${e instanceof Error ? e.message : String(e)}`)

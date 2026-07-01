@@ -1,0 +1,94 @@
+{% extends "layouts/main.njk" %}
+
+{% set fullWidth = true %}
+
+{% block content %}
+<div class="page-aurora relative min-h-screen flex flex-col">
+  <div class="aurora-hero-sky" aria-hidden="true">
+    <div class="aurora-ribbon__stars absolute inset-0"></div>
+    <div class="aurora-ribbon__wave aurora-ribbon__wave--1 absolute inset-x-0 top-0 h-[50vh]"></div>
+    <div class="aurora-ribbon__wave aurora-ribbon__wave--2 absolute inset-x-0 top-0 h-[45vh]"></div>
+    <div class="aurora-ribbon__wave aurora-ribbon__wave--3 absolute inset-x-0 top-0 h-[40vh]"></div>
+  </div>
+
+  <header class="relative z-20 flex flex-wrap items-center justify-between gap-4 px-6 sm:px-12 py-5 border-b border-cyan-500/10"
+          style="background: rgba(8,6,18,.8); backdrop-filter: blur(20px);">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center aurora-cta">
+        <iconify-icon icon="carbon:cloud" width="18" height="18" class="text-white" aria-hidden="true"></iconify-icon>
+      </div>
+      <span class="text-[15px] font-bold text-cyan-50 tracking-wide">{{ branding.appName }}</span>
+      <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide uppercase badge-accent">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 dot-live"></span>
+        OIDC
+      </span>
+    </div>
+    <a href="/login"
+       class="aurora-cta flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-all">
+      <iconify-icon icon="carbon:login" width="14" height="14" aria-hidden="true"></iconify-icon>
+      Connexion
+    </a>
+  </header>
+
+  <main class="relative z-10 flex-1 max-w-[900px] w-full mx-auto px-6 sm:px-12 py-12 sm:py-16">
+    <section class="text-center">
+      <p class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-semibold tracking-wide uppercase mb-8 badge-accent">
+        <iconify-icon icon="carbon:cloud-lightning" width="11" height="11" aria-hidden="true"></iconify-icon>
+        Serveur d'identité
+      </p>
+
+      <h1 class="text-[clamp(2rem,6vw,3.25rem)] font-extrabold text-cyan-50 leading-[1.08] tracking-tight mb-5">
+        Sous les<br>
+        <span class="text-gradient">aurores de l'accès.</span>
+      </h1>
+      <p class="text-[15px] text-zinc-500 leading-relaxed max-w-md mx-auto mb-12">
+        Une identité unique, des lueurs d'accès pour chaque application de votre organisation.
+      </p>
+    </section>
+
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-14">
+      <div class="aurora-card-mini rounded-2xl p-5">
+        <iconify-icon icon="carbon:email" width="28" height="28" class="text-cyan-400 mb-3" aria-hidden="true"></iconify-icon>
+        <div class="text-[14px] font-bold text-zinc-100 mb-1">Messagerie</div>
+        <div class="text-[12px] text-zinc-500 mb-4">Courrier et notifications</div>
+        <a href="/auth?client=messagerie" class="text-[12px] font-semibold link-accent">Accéder →</a>
+      </div>
+      <div class="aurora-card-mini rounded-2xl p-5">
+        <iconify-icon icon="carbon:calendar" width="28" height="28" class="text-purple-400 mb-3" aria-hidden="true"></iconify-icon>
+        <div class="text-[14px] font-bold text-zinc-100 mb-1">Calendrier</div>
+        <div class="text-[12px] text-zinc-500 mb-4">Agenda partagé</div>
+        <a href="/auth?client=calendrier" class="text-[12px] font-semibold link-accent">Accéder →</a>
+      </div>
+      <div class="aurora-card-mini rounded-2xl p-5">
+        <iconify-icon icon="carbon:document" width="28" height="28" class="text-emerald-400 mb-3" aria-hidden="true"></iconify-icon>
+        <div class="text-[14px] font-bold text-zinc-100 mb-1">Documents</div>
+        <div class="text-[12px] text-zinc-500 mb-4">Fichiers et partage</div>
+        <a href="/auth?client=documents" class="text-[12px] font-semibold link-accent">Accéder →</a>
+      </div>
+    </section>
+
+    <section class="aurora-card-mini rounded-3xl p-8 sm:p-10 text-center">
+      <h2 class="text-xl font-bold text-cyan-50 mb-3">Prêt à vous connecter ?</h2>
+      <p class="text-[14px] text-zinc-500 mb-6 max-w-sm mx-auto">
+        Utilisez vos identifiants {{ branding.appName }} pour accéder à l'ensemble de vos services.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a href="/login"
+           class="aurora-cta inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl text-[14px] font-bold text-white w-full sm:w-auto">
+          <iconify-icon icon="carbon:login" width="15" height="15" aria-hidden="true"></iconify-icon>
+          Se connecter
+        </a>
+        <a href="/register"
+           class="inline-flex items-center justify-center px-8 py-3 rounded-xl text-[13px] font-semibold text-zinc-400 w-full sm:w-auto"
+           style="background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);">
+          Créer un compte
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="relative z-10 border-t border-cyan-500/10 px-6 sm:px-12 py-4 text-center">
+    <span class="text-[11px] text-zinc-600">{{ branding.appName }} · Fournisseur d'identité OIDC</span>
+  </footer>
+</div>
+{% endblock %}

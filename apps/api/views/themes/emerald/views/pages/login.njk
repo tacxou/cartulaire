@@ -1,0 +1,56 @@
+{% extends "layouts/main.njk" %}
+
+{% block content %}
+<article class="w-full emerald-parchment">
+  <header class="emerald-parchment__header">
+    <img src="{{ branding.logo }}" width="80" height="80" alt="{{ branding.appName }}"
+      class="w-16 h-16 object-contain select-none mx-auto" />
+    <h1 class="mt-5">Connexion</h1>
+    <p>Portail sécurisé · {{ branding.appName }}</p>
+  </header>
+
+  <div class="emerald-parchment__body">
+    {% if errorMessage %}
+    <div class="mb-5 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+      {{ errorMessage }}
+    </div>
+    {% endif %}
+
+    <form action="/interaction/{{ uid }}" method="POST" autocomplete="off" class="space-y-5">
+      <div>
+        <label for="username" class="flex items-center gap-1.5 mb-2">
+          <span class="emerald-leaf" aria-hidden="true"></span>
+          Identifiant
+        </label>
+        <input type="text" name="username" id="username" value="{{ form.username | default('') }}" required
+          class="glass-field block w-full rounded-lg px-4 py-3 text-[15px] transition" />
+      </div>
+
+      <div>
+        <label for="password" class="flex items-center gap-1.5 mb-2">
+          <span class="emerald-leaf" aria-hidden="true"></span>
+          Mot de passe
+        </label>
+        <input type="password" name="password" id="password" required
+          class="glass-field block w-full rounded-lg px-4 py-3 text-[15px] transition" />
+      </div>
+
+      <div class="flex justify-end">
+        <a href="/forgot-password" class="link-accent text-[13px] font-medium transition">
+          Mot de passe oublié ?
+        </a>
+      </div>
+
+      <button type="submit"
+        class="btn-primary w-full rounded-full px-4 py-3.5 text-[15px] transition active:scale-[0.99]">
+        Entrer
+      </button>
+
+      <p class="text-center text-[13px] pt-1" style="color: var(--emerald-muted);">
+        Pas encore de compte ?
+        <a href="/register" class="link-accent font-semibold transition">S'inscrire</a>
+      </p>
+    </form>
+  </div>
+</article>
+{% endblock %}

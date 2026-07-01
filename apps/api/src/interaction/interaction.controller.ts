@@ -1,9 +1,17 @@
 import { BadRequestException, Body, Controller, Get, Logger, Post, Req, Res } from '@nestjs/common'
 import { Request, Response } from 'express'
-import { InjectOidcProvider, InteractionHelper, OidcInteraction, Provider } from 'nest-oidc-provider'
+import {
+  InjectOidcProvider,
+  InteractionHelper,
+  KoaContextWithOIDC,
+  OidcContext,
+  OidcInteraction,
+  Provider,
+} from 'nest-oidc-provider'
 import { ConsentLabelsService } from '~/consent-labels/consent-labels.service'
 import { IdentityService } from '~/identity/identity.service'
 import { ConsentService } from '~/consent/consent.service'
+import { AuditService } from '~/audit/audit.service'
 // import { verifyToken } from 'node-2fa'
 
 @Controller('/interaction')
@@ -15,6 +23,7 @@ export class InteractionController {
     private readonly consentLabels: ConsentLabelsService,
     private readonly identity: IdentityService,
     private readonly consent: ConsentService,
+    private readonly audit: AuditService,
   ) {}
 
   @Get(':uid')
@@ -141,9 +150,12 @@ export class InteractionController {
       // daemon (§22). Le cœur ne connaît ni le stockage ni l'algo de hachage.
       const account = await this.identity.authenticate(form.username, form.password)
       if (!account) {
+        // Audit : échec sans divulguer l'identifiant tenté (§35, §36.1).
+        this.audit.loginFailure('invalid_credentials', String((params as any).client_id ?? ''))
         // Message générique imposé — ne jamais révéler la cause exacte (§36.1).
         throw new BadRequestException('Identifiant ou mot de passe invalide.')
       }
+      this.audit.loginSuccess(account.sub, String((params as any).client_id ?? ''))
 
       if (lastSubmission && lastSubmission.twofa && req.body.token) {
         // console.log('verif', verifyToken(user.googleAuthKey, req.body.token))
@@ -262,6 +274,7 @@ export class InteractionController {
       : []
     if (consentedScopes.length) {
       await this.consent.saveConsent(String(accountId), String((params as any).client_id), consentedScopes)
+      this.audit.consentAccepted(String(accountId), String((params as any).client_id), consentedScopes)
     }
 
     const consent = {} as any
@@ -272,6 +285,29 @@ export class InteractionController {
     return interaction.finished(result, {
       mergeWithLastSubmission: true,
     })
+  }
+
+  @Get(':uid/abort/logout')
+  public async abortLogoutPage(
+    @OidcInteraction() interaction: InteractionHelper,
+    @Res() res: Response,
+  ): Promise<void> {
+    const { uid } = await interaction.details()
+    res.render('pages/abort-logout', { uid })
+  }
+
+  @Get(':uid/abort/sign-out')
+  public async abortSignOut(
+    @OidcContext() ctx: KoaContextWithOIDC,
+    @Res() res: Response,
+  ): Promise<void> {
+    const session = await ctx.oidc.provider.Session.get(ctx)
+    if (session) {
+      await session.destroy()
+      this.logger.debug('OIDC session destroyed after consent abort')
+    }
+
+    res.render('pages/logout-success', { clientDisplay: null })
   }
 
   @Get(':uid/abort')

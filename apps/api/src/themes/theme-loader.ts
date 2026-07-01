@@ -21,20 +21,28 @@ interface CachedSource {
  * 2. views/<template> (défaut)
  */
 export class ThemeAwareLoader extends nunjucks.Loader {
-  private readonly cache = new Map<string, CachedSource>()
+  /** Cache des sources lues — distinct de `cache` injecté par nunjucks.Environment. */
+  private readonly sourceCache = new Map<string, CachedSource>()
+
+  /**
+   * Cache des templates compilés, assigné par nunjucks.Environment._initLoaders().
+   * Ne pas remplacer par une Map : nunjucks utilise un objet plain `{}`.
+   */
+  public cache: Record<string, unknown> = {}
 
   public constructor(private readonly options: ThemeLoaderOptions) {
     super()
   }
 
   public invalidateCache(): void {
-    this.cache.clear()
+    this.sourceCache.clear()
+    this.cache = {}
   }
 
   public getSource(name: string): CachedSource | null {
     const cacheKey = `${this.options.resolveThemeId()}:${name}`
-    if (!this.options.noCache && this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey)!
+    if (!this.options.noCache && this.sourceCache.has(cacheKey)) {
+      return this.sourceCache.get(cacheKey)!
     }
 
     const resolved = this.resolveTemplatePath(name)
@@ -47,7 +55,7 @@ export class ThemeAwareLoader extends nunjucks.Loader {
     }
 
     if (!this.options.noCache) {
-      this.cache.set(cacheKey, source)
+      this.sourceCache.set(cacheKey, source)
     }
 
     return source

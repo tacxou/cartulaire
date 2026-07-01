@@ -1,0 +1,105 @@
+{% extends "layouts/main.njk" %}
+
+{% block content %}
+<div class="w-full emerald-consent">
+  <div class="p-8 sm:p-10 border-b" style="border-color: var(--emerald-paper-edge);">
+    <div class="flex items-start gap-4">
+      <span class="emerald-leaf shrink-0 mt-1" style="width: 1.75rem; height: 1.75rem;" aria-hidden="true"></span>
+      <div>
+        <h2 class="text-2xl font-semibold tracking-tight" style="font-family: 'Cormorant Garamond', Georgia, serif;">
+          Autoriser l'application
+        </h2>
+        <p class="mt-1.5 text-[15px]">Vérifiez les accès demandés avant d'accepter</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-8 sm:p-10">
+    <form action="/interaction/{{ uid }}/confirm" method="POST" autocomplete="off" class="space-y-6">
+      <div class="rounded-xl glass-field px-5 py-4">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.14em]">Application</p>
+        <p class="mt-1 text-lg font-semibold truncate" title="{{ client.clientName or client.clientId or params.client_id }}">
+          {{ client.clientName or client.clientId or params.client_id }}
+        </p>
+        {% if client.clientId and client.clientName %}
+        <p class="mt-0.5 text-[13px] font-mono truncate">{{ client.clientId }}</p>
+        {% endif %}
+      </div>
+
+      {% if (consentScopes | default([]) | length) > 0 %}
+      <div>
+        <h3 class="text-[13px] font-semibold uppercase tracking-wide mb-3">Périmètres OpenID / OAuth</h3>
+        <ul class="space-y-2.5" role="list">
+          {% for item in consentScopes %}
+          <li class="rounded-xl border px-4 py-3.5 flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-4"
+              style="border-color: var(--emerald-paper-edge); background: #fff;">
+            <span class="badge-accent inline-flex shrink-0 self-start items-center rounded-lg px-2.5 py-1 text-[11px] font-semibold font-mono tracking-tight">{{ item.scope }}</span>
+            <p class="text-[14px] leading-snug">
+              {% if item.description %}{{ item.description }}{% else %}Accès au périmètre «&nbsp;{{ item.scope }}&nbsp;».{% endif %}
+            </p>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if (consentClaims | default([]) | length) > 0 %}
+      <div>
+        <h3 class="text-[13px] font-semibold uppercase tracking-wide mb-3">Claims OpenID demandées</h3>
+        <ul class="space-y-2.5" role="list">
+          {% for item in consentClaims %}
+          <li class="rounded-xl border px-4 py-3.5 flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-4"
+              style="border-color: var(--emerald-paper-edge); background: #fff;">
+            <span class="inline-flex shrink-0 self-start items-center rounded-lg px-2.5 py-1 text-[11px] font-semibold font-mono tracking-tight"
+                  style="background: rgba(45,106,79,.1); color: var(--emerald-ink); border: 1px solid var(--emerald-paper-edge);">{{ item.claim }}</span>
+            <p class="text-[14px] leading-snug">
+              {% if item.description %}{{ item.description }}{% else %}Publication de la revendication «&nbsp;{{ item.claim }}&nbsp;».{% endif %}
+            </p>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      {% if (consentResourceScopes | default([]) | length) > 0 %}
+      <div>
+        <h3 class="text-[13px] font-semibold uppercase tracking-wide mb-3">Ressources (RFC 8707)</h3>
+        <div class="space-y-4">
+          {% for block in consentResourceScopes %}
+          <div class="rounded-xl border p-4" style="border-color: var(--emerald-paper-edge); background: #fff;">
+            <p class="text-[11px] font-mono break-all leading-relaxed">{{ block.resource }}</p>
+            {% if block.scopes and block.scopes.length %}
+            <div class="mt-3 flex flex-wrap gap-2">
+              {% for s in block.scopes %}
+              <span class="badge-accent-subtle inline-flex items-center rounded-lg px-2.5 py-1 text-[11px] font-mono">{{ s }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if (consentScopes | default([]) | length) == 0
+        and (consentClaims | default([]) | length) == 0
+        and (consentResourceScopes | default([]) | length) == 0 %}
+      <div class="rounded-xl border border-dashed px-5 py-8 text-center" style="border-color: var(--emerald-paper-edge);">
+        <p class="text-[14px]">Aucune nouvelle autorisation listée. Vous pouvez continuer ou annuler.</p>
+      </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
+        <a href="/interaction/{{ uid }}/abort/logout"
+          class="btn-glass inline-flex w-full min-h-[52px] justify-center items-center text-center rounded-full px-5 py-3 text-[13px] sm:text-[14px] leading-tight transition order-2 sm:order-1 active:scale-[0.99]">
+          Refuser
+        </a>
+        <button type="submit"
+          class="btn-primary inline-flex w-full min-h-[52px] justify-center items-center text-center rounded-full px-5 py-3 text-[14px] leading-tight transition order-1 sm:order-2 active:scale-[0.99]">
+          Autoriser
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

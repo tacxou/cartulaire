@@ -9,6 +9,7 @@ import { OidcConfigModule } from './oidc-config/oidc-config.module'
 import { InteractionModule } from './interaction/interaction.module'
 import { IdentityModule } from './identity/identity.module'
 import { ConsentModule } from './consent/consent.module'
+import { AuditModule } from './audit/audit.module'
 import { SettingsModule } from './settings/settings.module'
 import { ThemesModule } from './themes/themes.module'
 import { ViewContextMiddleware } from './themes/view-context.middleware'
@@ -24,6 +25,7 @@ import { resolveStaticRoot } from './_common/_functions/resolve-static-root'
     }),
     IdentityModule,
     ConsentModule,
+    AuditModule,
     SettingsModule,
     ThemesModule,
     ServeStaticModule.forRoot({

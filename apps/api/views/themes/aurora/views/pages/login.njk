@@ -1,0 +1,64 @@
+{% extends "layouts/main.njk" %}
+
+{% block content %}
+<div class="w-full max-w-md aurora-card">
+  <div class="aurora-ribbon">
+    <div class="aurora-ribbon__sky" aria-hidden="true"></div>
+    <div class="aurora-ribbon__stars" aria-hidden="true"></div>
+    <div class="aurora-ribbon__wave aurora-ribbon__wave--1" aria-hidden="true"></div>
+    <div class="aurora-ribbon__wave aurora-ribbon__wave--2" aria-hidden="true"></div>
+    <div class="aurora-ribbon__wave aurora-ribbon__wave--3" aria-hidden="true"></div>
+    <div class="aurora-ribbon__content">
+      <img src="{{ branding.logo }}" width="72" height="72" alt="{{ branding.appName }}"
+        class="w-[4.5rem] h-[4.5rem] object-contain select-none mx-auto drop-shadow-lg" />
+      <h1 class="mt-4 text-xl font-semibold tracking-wide text-cyan-50">
+        {{ branding.appName }}
+      </h1>
+      <p class="mt-1 text-[13px] text-cyan-200/60 tracking-[0.2em] uppercase">Aurore boréale</p>
+    </div>
+  </div>
+
+  <div class="p-8 sm:p-9 glass-inner">
+    <div class="text-center mb-7">
+      <h2 class="text-2xl font-semibold tracking-tight text-zinc-50">Connexion</h2>
+      <p class="mt-1.5 text-[14px] text-zinc-500">Accédez à votre espace sécurisé</p>
+    </div>
+
+    {% if errorMessage %}
+    <div class="mb-5 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+      {{ errorMessage }}
+    </div>
+    {% endif %}
+
+    <form action="/interaction/{{ uid }}" method="POST" autocomplete="off" class="space-y-4">
+      <div>
+        <label for="username" class="block text-[12px] font-medium text-cyan-200/50 mb-1.5 uppercase tracking-wider">Identifiant</label>
+        <input type="text" name="username" id="username" value="{{ form.username | default('') }}" required
+          class="glass-field block w-full rounded-xl px-4 py-3 text-[15px] placeholder:text-zinc-600 transition" />
+      </div>
+
+      <div>
+        <label for="password" class="block text-[12px] font-medium text-cyan-200/50 mb-1.5 uppercase tracking-wider">Mot de passe</label>
+        <input type="password" name="password" id="password" required
+          class="glass-field block w-full rounded-xl px-4 py-3 text-[15px] placeholder:text-zinc-600 transition" />
+      </div>
+
+      <div class="flex justify-end pt-0.5">
+        <a href="/forgot-password" class="link-accent text-[13px] font-medium transition">
+          Mot de passe oublié ?
+        </a>
+      </div>
+
+      <button type="submit"
+        class="btn-primary w-full rounded-xl px-4 py-3.5 text-[14px] transition active:scale-[0.99]">
+        Se connecter
+      </button>
+
+      <p class="text-center text-[13px] text-zinc-500 pt-2">
+        Pas encore de compte ?
+        <a href="/register" class="link-accent font-semibold transition">Créer un compte</a>
+      </p>
+    </form>
+  </div>
+</div>
+{% endblock %}

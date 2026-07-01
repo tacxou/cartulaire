@@ -1,0 +1,71 @@
+{% extends "layouts/main.njk" %}
+
+{% set fullWidth = true %}
+
+{% block content %}
+<div class="page-terminal relative min-h-screen flex flex-col">
+  <header class="crt-titlebar px-6 sm:px-10 py-3">
+    <span class="crt-titlebar__dot crt-titlebar__dot--active" aria-hidden="true"></span>
+    <span class="crt-titlebar__dot" aria-hidden="true"></span>
+    <span class="crt-titlebar__dot" aria-hidden="true"></span>
+    <span class="ml-2">{{ branding.appName | lower }}@oidc:~$</span>
+    <span class="ml-auto hidden sm:inline" style="color: var(--crt-dim);">uptime: ok · tls: on</span>
+  </header>
+
+  <main class="relative z-10 flex-1 max-w-3xl w-full mx-auto px-6 sm:px-10 py-8 sm:py-12">
+    <pre class="crt-line crt-line--bright text-[0.7rem] sm:text-xs mb-6 whitespace-pre" aria-hidden="true">┌─────────────────────────────────────┐
+│  {{ branding.appName | upper }}                     │
+│  identity provider v1.0             │
+└─────────────────────────────────────┘</pre>
+
+    <p class="crt-line crt-line--bright mb-1">$ cat /etc/oidc/manifest</p>
+    <p class="crt-line mb-6">issuer: {{ issuerHost | default('localhost') }}</p>
+
+    <p class="crt-line crt-line--bright mb-3">$ ls --apps /services/</p>
+    <div class="space-y-2 mb-10 font-mono text-sm">
+      <div class="crt-app-row flex items-center justify-between gap-4">
+        <span class="crt-line--bright">messagerie.service</span>
+        <a href="/auth?client=messagerie">connect</a>
+      </div>
+      <div class="crt-app-row flex items-center justify-between gap-4">
+        <span class="crt-line--bright">calendrier.service</span>
+        <a href="/auth?client=calendrier">connect</a>
+      </div>
+      <div class="crt-app-row flex items-center justify-between gap-4">
+        <span class="crt-line--bright">documents.service</span>
+        <a href="/auth?client=documents">connect</a>
+      </div>
+      <div class="crt-app-row flex items-center justify-between gap-4">
+        <span class="crt-line--bright">wiki.service</span>
+        <a href="/auth?client=wiki">connect</a>
+      </div>
+    </div>
+
+    <p class="crt-line crt-line--bright mb-3">$ ./login --interactive</p>
+    <div class="crt-window max-w-md">
+      <div class="crt-body" style="padding: 1.25rem 1.5rem;">
+        <p class="text-[0.8rem] mb-4" style="color: var(--crt-dim);">
+          authentification native {{ branding.appName | lower }}
+        </p>
+        <a href="/login"
+           class="btn-primary inline-flex items-center justify-center w-full px-4 py-2.5 text-[12px] transition">
+          [ENTER] se connecter
+        </a>
+        <a href="/register"
+           class="mt-3 inline-flex items-center justify-center w-full px-4 py-2 text-[12px] transition"
+           style="color: var(--crt-dim); border: 1px solid rgba(34,211,238,.15);">
+          ./register --new
+        </a>
+      </div>
+    </div>
+
+    <p class="crt-line mt-8">
+      <span class="crt-cursor" aria-hidden="true"></span>
+    </p>
+  </main>
+
+  <footer class="crt-titlebar px-6 sm:px-10 py-2 text-center sm:text-left">
+    <span>{{ branding.appName }} · OIDC · all systems operational</span>
+  </footer>
+</div>
+{% endblock %}

@@ -1,14 +1,201 @@
-/* Surcharge CSS — thème Midnight */
-.glass-tint {
-  border-right-color: rgba(14, 165, 233, 0.2);
+/* Midnight — terminal CRT */
+[data-theme="midnight"] {
+  --crt-green: #22d3ee;
+  --crt-dim: #155e75;
+  --crt-bg: #000000;
 }
 
-.btn-primary {
-  letter-spacing: 0.02em;
+[data-theme="midnight"] .theme-auth-wrap {
+  background: var(--crt-bg);
+  background-image: none;
+}
+
+[data-theme="midnight"] .theme-auth-overlay {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15) 0px,
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    radial-gradient(ellipse 100% 80% at 50% 50%, rgba(34, 211, 238, 0.04), transparent 70%);
+  opacity: 1;
+}
+
+[data-theme="midnight"] .theme-body {
+  color: var(--crt-green);
+}
+
+[data-theme="midnight"] .glass-field {
+  color: var(--crt-green);
+  border-radius: 0;
+  font-family: inherit;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+[data-theme="midnight"] .glass-field::placeholder {
+  color: var(--crt-dim);
+}
+
+[data-theme="midnight"] .btn-primary {
+  border-radius: 0;
   text-transform: uppercase;
-  font-size: 0.9em;
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+  background: transparent;
+  color: var(--crt-green);
+  border: 1px solid var(--crt-green);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.2), inset 0 0 20px rgba(34, 211, 238, 0.05);
 }
 
-.page-index .brand-icon {
-  border-radius: 12px;
+[data-theme="midnight"] .btn-primary:hover {
+  background: rgba(34, 211, 238, 0.1);
+  color: #fff;
+}
+
+[data-theme="midnight"] .link-accent {
+  color: var(--crt-green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+[data-theme="midnight"] .link-accent:hover {
+  color: #fff;
+}
+
+.crt-window {
+  width: 100%;
+  max-width: 36rem;
+  background: #0a0a0a;
+  border: 1px solid var(--crt-green);
+  box-shadow:
+    0 0 60px rgba(34, 211, 238, 0.15),
+    inset 0 0 80px rgba(34, 211, 238, 0.03);
+  font-family: inherit;
+}
+
+.crt-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(34, 211, 238, 0.06);
+  border-bottom: 1px solid rgba(34, 211, 238, 0.2);
+  font-size: 0.7rem;
+  color: var(--crt-dim);
+  letter-spacing: 0.05em;
+}
+
+.crt-titlebar__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  border: 1px solid var(--crt-dim);
+}
+
+.crt-titlebar__dot--active {
+  background: var(--crt-green);
+  border-color: var(--crt-green);
+  box-shadow: 0 0 6px var(--crt-green);
+}
+
+.crt-body {
+  padding: 1.5rem 1.5rem 1.75rem;
+  position: relative;
+}
+
+.crt-body::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.12) 0px,
+    rgba(0, 0, 0, 0.12) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+}
+
+.crt-prompt {
+  color: var(--crt-green);
+  font-size: 0.8rem;
+}
+
+.crt-prompt::before {
+  content: "> ";
+  color: var(--crt-dim);
+}
+
+.crt-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.1em;
+  background: var(--crt-green);
+  vertical-align: text-bottom;
+  animation: crt-blink 1.1s step-end infinite;
+}
+
+@keyframes crt-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.crt-label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--crt-dim);
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.06em;
+}
+
+.crt-label::before {
+  content: "$ ";
+  color: var(--crt-green);
+}
+
+/* Page d'accueil terminal */
+.page-terminal {
+  background: #000;
+  color: var(--crt-green);
+  font-family: inherit;
+}
+
+.page-terminal .crt-line {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: var(--crt-dim);
+}
+
+.page-terminal .crt-line--bright {
+  color: var(--crt-green);
+}
+
+.page-terminal .crt-line::before {
+  content: "  ";
+}
+
+.page-terminal .crt-app-row {
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  padding: 0.75rem 1rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.page-terminal .crt-app-row:hover {
+  border-color: rgba(34, 211, 238, 0.4);
+  background: rgba(34, 211, 238, 0.04);
+}
+
+.page-terminal .crt-app-row a {
+  color: var(--crt-green);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.page-terminal .crt-app-row a:hover {
+  color: #fff;
 }

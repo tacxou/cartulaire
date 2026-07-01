@@ -15,6 +15,7 @@
     "start:prod": "node dist/main"
   },
   "dependencies": {
+    "@cartulaire/audit": "*",
     "@cartulaire/config": "*",
     "@cartulaire/connector-contracts": "*",
     "@cartulaire/core": "*",

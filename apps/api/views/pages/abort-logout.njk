@@ -16,7 +16,7 @@
 <script>
   (function () {
     const abortCompleteUrl = '/interaction/{{ uid }}/abort/complete'
-    const logoutUrl = '/oidc/session/end'
+    const signOutUrl = '/interaction/{{ uid }}/abort/sign-out'
 
     window
       .fetch(abortCompleteUrl, {
@@ -26,10 +26,10 @@
         keepalive: true,
       })
       .catch(function () {
-        // En cas d'echec front, on tente quand meme la deconnexion.
+        // En cas d'échec (ex. redirect cross-origin), on tente quand même la déconnexion.
       })
       .finally(function () {
-       // window.location.assign(logoutUrl)
+        window.location.assign(signOutUrl)
       })
   })()
 </script>
