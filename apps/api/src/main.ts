@@ -114,6 +114,8 @@ declare const module: any
   app.use('/interaction', urlencoded({ extended: false }))
   app.use('/account', urlencoded({ extended: false }))
   app.use('/account', json()) // endpoints WebAuthn (start/finish) en JSON
+  app.use('/forgot-password', urlencoded({ extended: false }))
+  app.use('/reset-password', urlencoded({ extended: false }))
 
   // Rate limiting des endpoints sensibles (SPEC §37).
   if (cfg.rateLimit.enabled) {
@@ -125,6 +127,8 @@ declare const module: any
     app.use('/oidc/token', rateLimit({ name: 'token', limiter: oauthLimiter, trustProxy: tp, json: true }))
     app.use('/oidc/device', rateLimit({ name: 'device', limiter: oauthLimiter, trustProxy: tp, json: true }))
     app.use('/oidc/me', rateLimit({ name: 'userinfo', limiter: oauthLimiter, trustProxy: tp, json: true }))
+    app.use('/forgot-password', rateLimit({ name: 'password-reset', limiter: loginLimiter, trustProxy: tp, methods: ['POST'] }))
+    app.use('/reset-password', rateLimit({ name: 'password-reset', limiter: loginLimiter, trustProxy: tp, methods: ['POST'] }))
   }
 
   // Protection CSRF des formulaires (login, MFA, consentement, compte) — SPEC §25.
@@ -133,6 +137,8 @@ declare const module: any
     const csrf = csrfProtection({ secure: cfg.oidc.isProduction })
     app.use('/interaction', csrf)
     app.use('/account', csrf)
+    app.use('/forgot-password', csrf)
+    app.use('/reset-password', csrf)
   }
 
   swagger(app)

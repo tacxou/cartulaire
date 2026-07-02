@@ -640,9 +640,12 @@ identity.getRoles
 auth.verifyPassword
 auth.verifyMfa
 auth.getMfaMethods
+auth.startMfa
 auth.registerMfa
 auth.disableMfa
 auth.changePassword
+auth.requestPasswordReset
+auth.resetPassword
 ```
 
 ### 14.3 OAuth / OIDC

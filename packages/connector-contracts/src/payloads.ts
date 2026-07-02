@@ -132,6 +132,26 @@ export const authDisableMfaResultSchema = z.object({
   disabled: z.boolean(),
 })
 
+// auth.requestPasswordReset — initie une réinitialisation (§14.2, §36.1)
+export const authRequestPasswordResetPayloadSchema = z.object({
+  identifier: z.string().min(1),
+  /** Base d'URL du lien de réinitialisation (le cœur possède l'origine). */
+  linkBase: z.string().optional(),
+})
+export const authRequestPasswordResetResultSchema = z.object({
+  /** Toujours `true` — ne jamais révéler si l'identifiant correspond à un compte (§36.1). */
+  requested: z.literal(true),
+})
+
+// auth.resetPassword — consomme un jeton de réinitialisation à usage unique
+export const authResetPasswordPayloadSchema = z.object({
+  token: z.string().min(1),
+  newPassword: z.string().min(8),
+})
+export const authResetPasswordResultSchema = z.object({
+  reset: z.boolean(),
+})
+
 // claims.map — projette un sujet + scopes vers des claims OIDC (§16.4)
 export const claimsMapPayloadSchema = z.object({
   subject: z.string().min(1),
@@ -186,6 +206,8 @@ export type AuthStartMfaResult = z.infer<typeof authStartMfaResultSchema>
 export type AuthVerifyMfaResult = z.infer<typeof authVerifyMfaResultSchema>
 export type AuthRegisterMfaResult = z.infer<typeof authRegisterMfaResultSchema>
 export type AuthDisableMfaResult = z.infer<typeof authDisableMfaResultSchema>
+export type AuthRequestPasswordResetResult = z.infer<typeof authRequestPasswordResetResultSchema>
+export type AuthResetPasswordResult = z.infer<typeof authResetPasswordResultSchema>
 export type ConsentGetPayload = z.infer<typeof consentGetPayloadSchema>
 export type ConsentGetResult = z.infer<typeof consentGetResultSchema>
 export type ConsentSavePayload = z.infer<typeof consentSavePayloadSchema>

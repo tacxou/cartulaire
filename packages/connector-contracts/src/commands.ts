@@ -24,6 +24,8 @@ export const COMMANDS = {
   AUTH_REGISTER_MFA: 'auth.registerMfa',
   AUTH_DISABLE_MFA: 'auth.disableMfa',
   AUTH_CHANGE_PASSWORD: 'auth.changePassword',
+  AUTH_REQUEST_PASSWORD_RESET: 'auth.requestPasswordReset',
+  AUTH_RESET_PASSWORD: 'auth.resetPassword',
 
   // §14.3 OAuth / OIDC
   CLIENT_GET: 'client.get',

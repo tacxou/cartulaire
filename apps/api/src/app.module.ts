@@ -12,6 +12,7 @@ import { ConsentModule } from './consent/consent.module'
 import { AuditModule } from './audit/audit.module'
 import { MfaModule } from './mfa/mfa.module'
 import { AccountModule } from './account/account.module'
+import { PasswordResetModule } from './password-reset/password-reset.module'
 import { SettingsModule } from './settings/settings.module'
 import { ThemesModule } from './themes/themes.module'
 import { ViewContextMiddleware } from './themes/view-context.middleware'
@@ -46,6 +47,7 @@ import { resolveStaticRoot } from './_common/_functions/resolve-static-root'
     }),
     InteractionModule,
     AccountModule,
+    PasswordResetModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -2,6 +2,8 @@ import {
   authDisableMfaPayloadSchema,
   authGetMfaMethodsPayloadSchema,
   authRegisterMfaPayloadSchema,
+  authRequestPasswordResetPayloadSchema,
+  authResetPasswordPayloadSchema,
   authStartMfaPayloadSchema,
   authVerifyMfaPayloadSchema,
   authVerifyPasswordPayloadSchema,
@@ -17,6 +19,7 @@ import {
 import { CommandFailure, createConnectorServer, defineCommand } from '@cartulaire/connector-sdk'
 import { findByIdentifier, findBySub, mapClaims } from './users'
 import { disableMfa, getMfaMethods, outbox, registerConfirm, registerStart, startMfa, verifyMfa } from './mfa'
+import { requestPasswordReset, resetPassword } from './password-reset'
 
 /**
  * Store de consentement en mémoire — clé `${subject}::${clientId}` → scopes.
@@ -41,6 +44,8 @@ const PERMISSIONS = [
   COMMANDS.AUTH_VERIFY_MFA,
   COMMANDS.AUTH_REGISTER_MFA,
   COMMANDS.AUTH_DISABLE_MFA,
+  COMMANDS.AUTH_REQUEST_PASSWORD_RESET,
+  COMMANDS.AUTH_RESET_PASSWORD,
   COMMANDS.CLAIMS_MAP,
   COMMANDS.CONSENT_GET,
   COMMANDS.CONSENT_SAVE,
@@ -115,6 +120,22 @@ const commands = [
   defineCommand(COMMANDS.AUTH_DISABLE_MFA, (payload) => {
     const { subject, methodId } = authDisableMfaPayloadSchema.parse(payload)
     return { disabled: disableMfa(subject, methodId) }
+  }),
+
+  defineCommand(COMMANDS.AUTH_REQUEST_PASSWORD_RESET, (payload) => {
+    const { identifier, linkBase } = authRequestPasswordResetPayloadSchema.parse(payload)
+    requestPasswordReset(identifier, linkBase)
+    // Toujours succès, que l'identifiant corresponde ou non à un compte (§36.1).
+    return { requested: true as const }
+  }),
+
+  defineCommand(COMMANDS.AUTH_RESET_PASSWORD, (payload) => {
+    const { token, newPassword } = authResetPasswordPayloadSchema.parse(payload)
+    const reset = resetPassword(token, newPassword)
+    if (!reset) {
+      throw new CommandFailure(ERROR_CODES.VALIDATION_ERROR, 'invalid or expired reset token', 'Lien invalide ou expiré.')
+    }
+    return { reset: true }
   }),
 
   defineCommand(COMMANDS.CLAIMS_MAP, (payload) => {

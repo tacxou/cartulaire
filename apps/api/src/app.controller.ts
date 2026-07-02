@@ -28,11 +28,6 @@ export class AppController {
     return res.render('pages/index', { issuerHost: issuerHostFromUri(issuer) })
   }
 
-  @Get('forgot-password')
-  public async forgotPassword(@Res() res: Response) {
-    return res.render('pages/forgot-password')
-  }
-
   @Get('themes')
   public listThemes() {
     const active = this.themes.getActiveTheme().id
