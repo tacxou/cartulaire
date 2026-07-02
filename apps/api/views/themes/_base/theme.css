@@ -1,10 +1,19 @@
 /* Styles partagés — toutes les couleurs passent par des variables CSS injectées au runtime. */
 html {
   font-family: var(--font-family);
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .theme-body {
   color: var(--color-text, #fafafa);
+  min-height: 100vh;
 }
 
 .theme-body--full {
@@ -22,6 +31,7 @@ html {
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  overflow: hidden;
   background-color: var(--color-bg-body);
   background-image: var(--bg-image, none);
   background-size: cover;
@@ -44,7 +54,9 @@ html {
 .theme-auth-overlay {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--color-bg-body) calc(var(--bg-overlay-opacity, 0.8) * 100%), transparent);
+  pointer-events: none;
+  background-color: var(--color-bg-body);
+  opacity: var(--bg-overlay-opacity, 0);
 }
 
 .glass-shell {

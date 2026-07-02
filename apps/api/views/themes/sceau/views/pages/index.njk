@@ -1,0 +1,105 @@
+{% extends "layouts/main.njk" %}
+
+{% set fullWidth = true %}
+
+{% block content %}
+<div class="page-index relative min-h-screen flex flex-col">
+
+  <header class="seal-rule-b relative z-20 flex flex-wrap items-center justify-between gap-4 px-6 sm:px-10 py-4">
+    <div class="flex items-center gap-3.5">
+      <div class="seal-mark w-[34px] h-[34px] text-[15px] font-bold">C</div>
+      <span class="text-[15px] font-bold seal-ink tracking-[3px] uppercase">{{ branding.appName }}</span>
+    </div>
+
+    <nav class="flex flex-wrap items-center justify-end gap-3 sm:gap-6 w-full sm:w-auto">
+      <a href="#" class="text-[12px] seal-ink font-medium uppercase tracking-[.08em] hover:underline">Documentation</a>
+      <a href="#" class="text-[12px] seal-ink font-medium uppercase tracking-[.08em] hover:underline">Support</a>
+      <a href="/login" class="seal-btn-ink px-6 py-2.5 text-[13px] transition-all">
+        Connexion
+      </a>
+    </nav>
+  </header>
+
+  <main class="relative z-10 flex-1 w-full max-w-[1160px] mx-auto px-6 sm:px-10">
+    <section class="pt-12 sm:pt-16 pb-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
+      <div class="max-w-[720px]">
+        <div class="seal-eyebrow mb-6 seal-rise">Serveur d'identité OIDC</div>
+        <h1 class="seal-serif seal-rise seal-rise--2 text-[clamp(2.75rem,8vw,5.25rem)] leading-[.98] tracking-tight seal-ink m-0">
+          Une identité.<br><em class="seal-red">Tous vos accès.</em>
+        </h1>
+      </div>
+      <div class="max-w-[280px] seal-rise seal-rise--3">
+        <p class="seal-rule-t text-[14px] seal-muted leading-relaxed pt-4 m-0">
+          Connectez-vous à vos applications via votre identité unique. Authentification OIDC, chiffrement de bout en bout.
+        </p>
+        <div class="flex items-center gap-2.5 mt-4">
+          <span class="w-2 h-2 rounded-full dot-live status-dot"></span>
+          <span class="text-[11px] font-semibold seal-ink uppercase tracking-[.13em] truncate" title="{{ issuerHost }}">SSO actif · {{ issuerHost }}</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="seal-rule-b flex items-baseline justify-between pb-2.5 mt-6">
+      <span class="text-[12px] font-bold seal-ink uppercase tracking-[.17em]">Applications disponibles</span>
+      <span class="seal-serif text-[20px] seal-red">07</span>
+    </div>
+
+    {% set apps = [
+      {"name": "Messagerie", "desc": "Courrier et notifications internes", "num": "01", "client": "messagerie"},
+      {"name": "Calendrier", "desc": "Agenda partagé et planification", "num": "02", "client": "calendrier"},
+      {"name": "Documents", "desc": "Gestion et partage de fichiers", "num": "03", "client": "documents"},
+      {"name": "Portail RH", "desc": "Congés, paie et suivi des équipes", "num": "04", "client": "rh"},
+      {"name": "Wiki Interne", "desc": "Base de connaissances centralisée", "num": "05", "client": "wiki"},
+      {"name": "Supervision", "desc": "Monitoring, alertes et métriques", "num": "06", "client": "supervision"},
+      {"name": "Helpdesk", "desc": "Tickets et gestion des incidents", "num": "07", "client": "helpdesk"}
+    ] %}
+
+    <div class="seal-grid">
+      {% for app in apps %}
+      <div class="seal-cell">
+        <div class="seal-serif text-[15px] seal-faint mb-5">{{ app.num }}</div>
+        <div class="text-[17px] font-semibold seal-ink mb-1">{{ app.name }}</div>
+        <div class="text-[12px] seal-faint leading-relaxed mb-5">{{ app.desc }}</div>
+        <a href="/auth?client={{ app.client }}" class="seal-cell-link transition">Accéder</a>
+      </div>
+      {% endfor %}
+
+      <div class="seal-cell opacity-50 select-none">
+        <div class="seal-serif text-[15px] seal-faint mb-5">08</div>
+        <div class="text-[17px] font-semibold seal-muted mb-1">Dashboard</div>
+        <div class="text-[12px] seal-faint leading-relaxed mb-5">Tableaux de bord personnalisés — bientôt</div>
+        <span class="text-[12px] font-semibold seal-faint uppercase tracking-[.12em]">Indisponible</span>
+      </div>
+    </div>
+
+    <section class="seal-panel relative overflow-hidden flex flex-col lg:flex-row items-stretch lg:items-center gap-7 p-8 sm:px-10 mt-12 mb-14">
+      <div class="seal-rings w-[220px] h-[220px] -right-10 top-1/2 -translate-y-1/2"></div>
+      <div class="seal-rings w-[140px] h-[140px] right-0 top-1/2 -translate-y-1/2 opacity-70"></div>
+
+      <div class="seal-mark w-[60px] h-[60px] text-[26px] shrink-0 mx-auto lg:mx-0">C</div>
+
+      <div class="flex-1 text-center lg:text-left">
+        <div class="seal-serif text-[clamp(1.4rem,2.5vw,1.65rem)] mb-1.5">Vous avez déjà un compte {{ branding.appName }} ?</div>
+        <p class="text-[13px] seal-panel-muted leading-relaxed m-0 max-w-[480px] mx-auto lg:mx-0">
+          Connectez-vous avec vos identifiants natifs pour accéder à l'ensemble de votre espace. Chiffrement TLS · Session 8h · MFA disponible.
+        </p>
+      </div>
+
+      <div class="relative z-10 flex flex-col sm:flex-row gap-3 shrink-0 w-full max-w-sm mx-auto lg:mx-0 lg:w-auto">
+        <a href="/login" class="btn-primary flex items-center justify-center px-7 py-3.5 text-[13px] transition-all active:scale-[0.99]">
+          Se connecter
+        </a>
+        <a href="/register" class="btn-glass flex items-center justify-center px-7 py-3.5 text-[13px] transition-all"
+          style="border-color: var(--seal-panel-line); color: var(--seal-panel-text);">
+          Créer un compte
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="seal-rule-t relative z-10 px-6 sm:px-10 py-4 flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3">
+    <span class="text-[11px] seal-faint uppercase tracking-[.13em]">{{ branding.appName }} — Fournisseur d'identité OIDC · Libertech</span>
+    <span class="text-[11px] seal-faint uppercase tracking-[.13em]">Tous les services opérationnels</span>
+  </footer>
+</div>
+{% endblock %}

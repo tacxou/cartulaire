@@ -1,0 +1,296 @@
+/* Ardoise — corporate plat. Clair par défaut, surfaces opaques. */
+
+[data-theme="ardoise"] {
+  --flat-ink: #141320;
+  --flat-body-text: #3c3a50;
+  --flat-muted: #5e5c72;
+  --flat-faint: #8a889c;
+  --flat-border: #e4e4ec;
+  --flat-border-strong: #d4d4e0;
+  --flat-surface: #ffffff;
+  --flat-surface-alt: #f4f4f8;
+  --flat-surface-inset: #fafafc;
+  --flat-success: #2f7a3d;
+  --flat-success-bg: #eef4ee;
+  --flat-success-border: #d4e4d4;
+  --flat-danger: #a03030;
+  --flat-danger-bg: #fdecec;
+  --flat-danger-border: #f2c8c8;
+  --flat-info-bg: #f0edfa;
+  --flat-info-border: #ddd7f0;
+  --flat-warn: #a15c07;
+  --flat-warn-bg: #fdf6ec;
+  --flat-warn-bg-2: #faeeda;
+  --flat-warn-orb: rgba(230, 160, 60, 0.22);
+  --flat-band-bg: #1c1b29;
+  --flat-band-text: #ffffff;
+  --flat-band-muted: #9d9bb2;
+  --flat-band-border: rgba(255, 255, 255, 0.16);
+  --flat-band-chip-bg: rgba(255, 255, 255, 0.1);
+}
+
+/* ---- Dé-glassification : surfaces opaques, bordures nettes, rayons resserrés ---- */
+[data-theme="ardoise"] .theme-body {
+  color: var(--flat-ink);
+}
+
+[data-theme="ardoise"] .glass-shell {
+  border-radius: 0.75rem;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+[data-theme="ardoise"] .glass-tint {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-right: 1px solid var(--flat-border);
+}
+
+[data-theme="ardoise"] .glass-field {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-radius: 0.5rem;
+  box-shadow: none;
+  color: var(--flat-ink);
+}
+
+[data-theme="ardoise"] .glass-field::placeholder {
+  color: var(--flat-faint);
+}
+
+[data-theme="ardoise"] .glass-field:focus {
+  box-shadow: 0 0 0 3px var(--glass-field-focus-ring);
+}
+
+[data-theme="ardoise"] .btn-primary {
+  border-radius: 0.5rem;
+  box-shadow: none;
+}
+
+[data-theme="ardoise"] .btn-primary:focus-visible {
+  box-shadow: 0 0 0 3px var(--glass-field-focus-ring);
+}
+
+[data-theme="ardoise"] .btn-glass {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-radius: 0.5rem;
+  background: var(--flat-surface);
+  border: 1px solid var(--flat-border-strong);
+  color: var(--flat-body-text);
+}
+
+[data-theme="ardoise"] .btn-glass:hover {
+  background: var(--flat-surface-alt);
+}
+
+[data-theme="ardoise"] .theme-auth-wrap [class*="rounded-2xl"] {
+  border-radius: 0.625rem;
+}
+
+/* ---- Remap des utilitaires sombres des vues par défaut vers la palette claire ---- */
+[data-theme="ardoise"] .text-zinc-50,
+[data-theme="ardoise"] .text-zinc-100 {
+  color: var(--flat-ink) !important;
+}
+
+[data-theme="ardoise"] .text-zinc-200,
+[data-theme="ardoise"] .text-zinc-300 {
+  color: var(--flat-body-text) !important;
+}
+
+[data-theme="ardoise"] .text-zinc-400 {
+  color: var(--flat-muted) !important;
+}
+
+[data-theme="ardoise"] .text-zinc-500,
+[data-theme="ardoise"] .text-zinc-600 {
+  color: var(--flat-faint) !important;
+}
+
+[data-theme="ardoise"] [class*="border-white"] {
+  border-color: var(--flat-border) !important;
+}
+
+[data-theme="ardoise"] [class*="bg-white/"] {
+  background-color: var(--flat-surface-alt) !important;
+}
+
+/* États : erreurs, infos, succès */
+[data-theme="ardoise"] [class*="bg-red-500/"] {
+  background-color: var(--flat-danger-bg) !important;
+}
+
+[data-theme="ardoise"] [class*="border-red-"] {
+  border-color: var(--flat-danger-border) !important;
+}
+
+[data-theme="ardoise"] [class*="text-red-"] {
+  color: var(--flat-danger) !important;
+}
+
+[data-theme="ardoise"] [class*="bg-violet-500/"] {
+  background-color: var(--flat-info-bg) !important;
+}
+
+[data-theme="ardoise"] [class*="border-violet-"] {
+  border-color: var(--flat-info-border) !important;
+}
+
+[data-theme="ardoise"] .text-violet-200 {
+  color: var(--color-primary) !important;
+}
+
+[data-theme="ardoise"] [class*="bg-emerald-500/"] {
+  background-color: var(--flat-success-bg) !important;
+}
+
+[data-theme="ardoise"] [class*="border-emerald-"] {
+  border-color: var(--flat-success-border) !important;
+}
+
+[data-theme="ardoise"] .text-emerald-200 {
+  color: var(--flat-success) !important;
+}
+
+[data-theme="ardoise"] [class*="bg-zinc-500/"] {
+  background-color: var(--flat-surface-alt) !important;
+}
+
+[data-theme="ardoise"] [class*="border-zinc-400"] {
+  border-color: var(--flat-border-strong) !important;
+}
+
+/* Page erreur — carte claire, accents rouges sobres */
+[data-theme="ardoise"] .error-shell {
+  background: var(--flat-surface) !important;
+  border: 1px solid var(--flat-danger-border) !important;
+  box-shadow: 0 12px 32px rgba(20, 19, 32, 0.08) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border-radius: 0.75rem;
+}
+
+/* Page déconnexion — avertissement orange en version claire */
+[data-theme="ardoise"] .logout-page .logout-tint {
+  background: linear-gradient(165deg, var(--flat-warn-bg), var(--flat-warn-bg-2)) !important;
+}
+
+[data-theme="ardoise"] .logout-page [class*="text-orange-"] {
+  color: var(--flat-warn) !important;
+}
+
+[data-theme="ardoise"] .logout-page [class*="bg-orange-"],
+[data-theme="ardoise"] .logout-page [class*="bg-amber-"] {
+  background-color: var(--flat-warn-orb) !important;
+}
+
+[data-theme="ardoise"] .logout-page .glass-shell {
+  box-shadow: 0 12px 32px rgba(20, 19, 32, 0.08);
+}
+
+/* ---- Utilitaires namespacés du thème (utilisés par les overrides .njk) ---- */
+.flat-ink { color: var(--flat-ink); }
+.flat-body { color: var(--flat-body-text); }
+.flat-muted { color: var(--flat-muted); }
+.flat-faint { color: var(--flat-faint); }
+
+.flat-link { color: var(--color-primary); }
+.flat-link:hover { color: var(--color-primary-hover); }
+
+.flat-card {
+  background: var(--flat-surface);
+  border: 1px solid var(--flat-border);
+  box-shadow: 0 1px 2px rgba(20, 19, 32, 0.05);
+}
+
+.flat-card--hover {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.flat-card--hover:hover {
+  border-color: var(--flat-border-strong);
+  box-shadow: 0 4px 12px rgba(20, 19, 32, 0.07);
+}
+
+.flat-header {
+  background: var(--flat-surface);
+  border-bottom: 1px solid var(--flat-border);
+}
+
+.flat-footer {
+  background: var(--flat-surface);
+  border-top: 1px solid var(--flat-border);
+}
+
+.flat-divider { border-top: 1px solid var(--flat-border); }
+
+.flat-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+.flat-pill-success {
+  background: var(--flat-success-bg);
+  border: 1px solid var(--flat-success-border);
+  color: var(--flat-success);
+}
+
+.flat-dot-success { background: var(--flat-success); }
+
+.flat-chip {
+  background: var(--color-badge-bg);
+  border: 1px solid var(--color-badge-border);
+  color: var(--color-badge-text);
+}
+
+.flat-alert-error {
+  background: var(--flat-danger-bg);
+  border: 1px solid var(--flat-danger-border);
+  color: var(--flat-danger);
+}
+
+.flat-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--tile, var(--color-primary)) 10%, var(--flat-surface));
+  border: 1px solid color-mix(in srgb, var(--tile, var(--color-primary)) 22%, var(--flat-surface));
+  color: color-mix(in srgb, var(--tile, var(--color-primary)) 75%, var(--flat-ink));
+}
+
+.flat-tile--sky { --tile: #0369a1; }
+.flat-tile--green { --tile: #047857; }
+.flat-tile--amber { --tile: #b45309; }
+.flat-tile--pink { --tile: #9d174d; }
+.flat-tile--indigo { --tile: #4338ca; }
+.flat-tile--teal { --tile: #0f766e; }
+.flat-tile--violet { --tile: #5b21b6; }
+.flat-tile--gray { --tile: #6b7280; }
+
+.flat-band {
+  background: var(--flat-band-bg);
+  color: var(--flat-band-text);
+}
+
+.flat-band-muted { color: var(--flat-band-muted); }
+
+.flat-band-chip {
+  background: var(--flat-band-chip-bg);
+  border: 1px solid var(--flat-band-border);
+  color: var(--flat-band-muted);
+}
+
+.flat-btn-inverse {
+  background: var(--flat-band-text);
+  color: var(--flat-band-bg);
+  font-weight: 600;
+}
+
+.flat-btn-inverse:hover { opacity: 0.9; }
+
+.flat-btn-outline-inverse {
+  border: 1px solid var(--flat-band-border);
+  color: var(--flat-band-muted);
+  font-weight: 600;
+}
+
+.flat-btn-outline-inverse:hover { background: var(--flat-band-chip-bg); }

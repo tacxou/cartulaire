@@ -1,0 +1,75 @@
+{% extends "layouts/main.njk" %}
+
+{% block content %}
+<div class="w-full max-w-4xl overflow-hidden glass-shell">
+  <div class="grid md:grid-cols-[5fr_4fr]">
+    <div class="relative hidden md:flex flex-col justify-between p-10 lg:p-12 glass-inner min-h-[34rem]">
+      <div class="flex items-center gap-3.5">
+        <div class="seal-mark w-9 h-9 text-[15px] font-bold">C</div>
+        <span class="text-[14px] font-bold seal-ink tracking-[3px] uppercase">{{ branding.appName }}</span>
+      </div>
+
+      <div>
+        <h1 class="seal-serif text-[clamp(2.5rem,5vw,4.25rem)] leading-[1] tracking-tight seal-ink">
+          Bienvenue<br><em class="seal-red">chez vous.</em>
+        </h1>
+        <p class="mt-6 text-[14px] leading-relaxed seal-muted max-w-[320px]">
+          Connexion sécurisée à votre espace. Une identité unique pour toutes vos applications.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] seal-faint uppercase tracking-[.15em]">Authentification OIDC</span>
+        <span class="seal-serif text-[15px] seal-faint">§ 01</span>
+      </div>
+    </div>
+
+    <div class="seal-panel p-8 sm:p-10 lg:p-12 flex flex-col justify-center">
+      <div class="md:hidden flex items-center gap-3 mb-8">
+        <div class="seal-mark w-9 h-9 text-[15px] font-bold">C</div>
+        <span class="text-[14px] font-bold tracking-[3px] uppercase">{{ branding.appName }}</span>
+      </div>
+
+      <h2 class="seal-serif text-[2.1rem]">Connexion</h2>
+      <p class="mt-2 text-[13px] seal-panel-muted">Saisissez vos identifiants</p>
+
+      {% if errorMessage %}
+      <div class="seal-alert-error--panel px-4 py-3 text-sm mt-6">
+        {{ errorMessage }}
+      </div>
+      {% endif %}
+
+      <form action="/interaction/{{ uid }}" method="POST" autocomplete="off" class="mt-10 space-y-7">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+        <div>
+          <label for="username" class="seal-label mb-2.5">Identifiant</label>
+          <input type="text" name="username" id="username" value="{{ form.username | default('') }}" required
+            class="seal-field-panel transition" />
+        </div>
+
+        <div>
+          <label for="password" class="seal-label mb-2.5">Mot de passe</label>
+          <input type="password" name="password" id="password" required
+            class="seal-field-panel transition" />
+        </div>
+
+        <div class="flex justify-end">
+          <a href="/forgot-password" class="seal-link-panel text-[12px] font-medium transition">
+            Mot de passe oublié ?
+          </a>
+        </div>
+
+        <button type="submit"
+          class="btn-primary w-full px-4 py-4 transition active:scale-[0.99]">
+          Se connecter
+        </button>
+
+        <p class="text-center text-[13px] seal-panel-muted">
+          Pas encore de compte ?
+          <a href="/register" class="seal-link-panel font-semibold transition">Créer un compte</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

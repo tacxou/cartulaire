@@ -4,6 +4,13 @@ description: Aurore boréale — bandeaux lumineux animés, mise en page vertica
 version: "1.1.0"
 author: Cartulaire
 
+branding:
+  appName: Cartulaire
+  logo: /assets/logo.png
+  backgroundImage: /assets/background.svg
+  backgroundColor: "#0c0a1a"
+  backgroundColorOpacity: 0.84
+
 variables:
   font-family: '"Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif'
   font-index-family: '"Outfit", sans-serif'

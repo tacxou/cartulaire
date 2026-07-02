@@ -14,24 +14,50 @@ import {
 export class BrandingDto {
   @IsString()
   @IsNotEmpty()
-  appName: string
+  appName = 'Cartulaire'
 
   @IsString()
   @IsNotEmpty()
-  logo: string
+  logo = '/assets/logo.png'
+
+  @IsString()
+  backgroundImage = '/assets/background.svg'
 
   @IsString()
   @IsNotEmpty()
-  backgroundImage: string
-
-  @IsString()
-  @IsNotEmpty()
-  backgroundColor: string
+  backgroundColor = '#09090b'
 
   @IsNumber()
   @Min(0)
   @Max(1)
-  backgroundColorOpacity: number
+  backgroundColorOpacity = 0.8
+}
+
+export class BrandingOverridesDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  appName?: string
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  logo?: string
+
+  @IsString()
+  @IsOptional()
+  backgroundImage?: string
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  backgroundColor?: string
+
+  @IsNumber()
+  @Min(0)
+  @Max(1)
+  @IsOptional()
+  backgroundColorOpacity?: number
 }
 
 export class PrefsDto {
@@ -58,9 +84,10 @@ export class SettingsDto {
   @Type(() => UiDto)
   ui: UiDto
 
+  @IsOptional()
   @ValidateNested()
-  @Type(() => BrandingDto)
-  branding: BrandingDto
+  @Type(() => BrandingOverridesDto)
+  branding?: BrandingOverridesDto
 
   @ValidateNested()
   @Type(() => PrefsDto)

@@ -1,0 +1,385 @@
+/* Sceau — éditorial : papier, encre, rouge de cire. Grande serif, angles vifs, inputs soulignés. */
+
+[data-theme="sceau"] {
+  --seal-ink: #16151a;
+  --seal-paper: #f2efe8;
+  --seal-paper-raised: #faf8f2;
+  --seal-muted: #5c5952;
+  --seal-faint: #84806f;
+  --seal-line: rgba(22, 21, 26, 0.15);
+  --seal-line-strong: #16151a;
+  --seal-red: #c8442c;
+  --seal-red-dark: #a83a25;
+  --seal-red-soft: #e0937f;
+  --seal-panel: #16151a;
+  --seal-panel-text: #f2efe8;
+  --seal-panel-muted: #8f8c9c;
+  --seal-panel-line: rgba(242, 239, 232, 0.3);
+  --seal-danger: #8c2f1c;
+  --seal-danger-bg: #f8e3dd;
+  --seal-danger-border: #ecc4b8;
+  --seal-success: #3d5a2e;
+  --seal-success-bg: #e9eddd;
+  --seal-success-border: #cdd8b8;
+  --seal-info-bg: #eae4d4;
+  --seal-info-border: #d8d0ba;
+  --seal-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+}
+
+/* ---- Cartes : papier net, angles vifs ---- */
+[data-theme="sceau"] .theme-body {
+  color: var(--seal-ink);
+}
+
+[data-theme="sceau"] .glass-shell {
+  border-radius: 0;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+[data-theme="sceau"] .glass-tint {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-right: 1px solid var(--seal-line-strong);
+}
+
+/* Titres éditoriaux en serif sur toutes les pages d'authentification */
+[data-theme="sceau"] .theme-auth-wrap h1,
+[data-theme="sceau"] .theme-auth-wrap h2 {
+  font-family: var(--seal-serif);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* ---- Champs : soulignés, sans fond ---- */
+[data-theme="sceau"] .glass-field {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-radius: 0;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  box-shadow: none;
+  padding-left: 0;
+  padding-right: 0;
+  color: var(--seal-ink);
+}
+
+[data-theme="sceau"] .glass-field::placeholder {
+  color: var(--seal-faint);
+}
+
+[data-theme="sceau"] .glass-field:focus {
+  box-shadow: none;
+  border-bottom-color: var(--seal-red);
+  outline: none;
+}
+
+/* ---- Boutons : rectangulaires, capitales espacées ---- */
+[data-theme="sceau"] .btn-primary {
+  border-radius: 0;
+  box-shadow: none;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.8rem;
+}
+
+[data-theme="sceau"] .btn-primary:focus-visible {
+  outline: 2px solid var(--seal-ink);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+[data-theme="sceau"] .btn-glass {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-radius: 0;
+  background: transparent;
+  border: 1px solid var(--seal-ink);
+  color: var(--seal-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.8rem;
+}
+
+[data-theme="sceau"] .btn-glass:hover {
+  background: rgba(22, 21, 26, 0.05);
+}
+
+[data-theme="sceau"] .theme-auth-wrap [class*="rounded-2xl"],
+[data-theme="sceau"] .theme-auth-wrap [class*="rounded-lg"],
+[data-theme="sceau"] .theme-auth-wrap [class*="rounded-xl"] {
+  border-radius: 0;
+}
+
+/* ---- Remap des utilitaires sombres des vues par défaut vers encre/papier ---- */
+[data-theme="sceau"] .text-zinc-50,
+[data-theme="sceau"] .text-zinc-100 {
+  color: var(--seal-ink) !important;
+}
+
+[data-theme="sceau"] .text-zinc-200,
+[data-theme="sceau"] .text-zinc-300,
+[data-theme="sceau"] .text-zinc-400 {
+  color: var(--seal-muted) !important;
+}
+
+[data-theme="sceau"] .text-zinc-500,
+[data-theme="sceau"] .text-zinc-600 {
+  color: var(--seal-faint) !important;
+}
+
+[data-theme="sceau"] [class*="border-white"] {
+  border-color: var(--seal-line) !important;
+}
+
+[data-theme="sceau"] [class*="bg-white/"] {
+  background-color: rgba(22, 21, 26, 0.04) !important;
+}
+
+/* Exceptions : panneaux sombres (tint des cartes split, page déconnexion) */
+[data-theme="sceau"] .glass-tint .text-zinc-50,
+[data-theme="sceau"] .glass-tint .text-zinc-100,
+[data-theme="sceau"] .logout-tint .text-zinc-50,
+[data-theme="sceau"] .logout-tint .text-zinc-100 {
+  color: var(--seal-panel-text) !important;
+}
+
+[data-theme="sceau"] .glass-tint .text-zinc-200,
+[data-theme="sceau"] .glass-tint .text-zinc-300,
+[data-theme="sceau"] .glass-tint .text-zinc-400,
+[data-theme="sceau"] .glass-tint .text-zinc-500,
+[data-theme="sceau"] .logout-tint .text-zinc-200,
+[data-theme="sceau"] .logout-tint .text-zinc-300,
+[data-theme="sceau"] .logout-tint .text-zinc-400 {
+  color: var(--seal-panel-muted) !important;
+}
+
+[data-theme="sceau"] .glass-tint [class*="border-white"],
+[data-theme="sceau"] .logout-tint [class*="border-white"] {
+  border-color: var(--seal-panel-line) !important;
+}
+
+[data-theme="sceau"] .glass-tint [class*="bg-white/"],
+[data-theme="sceau"] .logout-tint [class*="bg-white/"] {
+  background-color: rgba(242, 239, 232, 0.06) !important;
+}
+
+/* États : erreurs, infos, succès */
+[data-theme="sceau"] [class*="bg-red-500/"] {
+  background-color: var(--seal-danger-bg) !important;
+}
+
+[data-theme="sceau"] [class*="border-red-"] {
+  border-color: var(--seal-danger-border) !important;
+}
+
+[data-theme="sceau"] [class*="text-red-"] {
+  color: var(--seal-danger) !important;
+}
+
+[data-theme="sceau"] [class*="bg-violet-500/"] {
+  background-color: var(--seal-info-bg) !important;
+}
+
+[data-theme="sceau"] [class*="border-violet-"] {
+  border-color: var(--seal-info-border) !important;
+}
+
+[data-theme="sceau"] .text-violet-200 {
+  color: var(--seal-red-dark) !important;
+}
+
+[data-theme="sceau"] [class*="bg-emerald-500/"] {
+  background-color: var(--seal-success-bg) !important;
+}
+
+[data-theme="sceau"] [class*="border-emerald-"] {
+  border-color: var(--seal-success-border) !important;
+}
+
+[data-theme="sceau"] .text-emerald-200 {
+  color: var(--seal-success) !important;
+}
+
+[data-theme="sceau"] [class*="bg-zinc-500/"] {
+  background-color: var(--seal-info-bg) !important;
+}
+
+[data-theme="sceau"] [class*="border-zinc-400"] {
+  border-color: var(--seal-info-border) !important;
+}
+
+/* Page erreur — papier, filet encre, accents rouge de cire */
+[data-theme="sceau"] .error-shell {
+  background: var(--seal-paper-raised) !important;
+  border: 1px solid var(--seal-line-strong) !important;
+  box-shadow: 0 24px 48px rgba(22, 21, 26, 0.14) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  border-radius: 0;
+}
+
+/* ---- Utilitaires namespacés du thème (utilisés par les overrides .njk) ---- */
+.seal-serif { font-family: var(--seal-serif); font-weight: 400; }
+.seal-ink { color: var(--seal-ink); }
+.seal-muted { color: var(--seal-muted); }
+.seal-faint { color: var(--seal-faint); }
+.seal-red { color: var(--seal-red); }
+
+.seal-link { color: var(--seal-red); }
+.seal-link:hover { color: var(--seal-red-dark); }
+
+.seal-rule-b { border-bottom: 1px solid var(--seal-line-strong); }
+.seal-rule-t { border-top: 1px solid var(--seal-line-strong); }
+.seal-hairline-b { border-bottom: 1px solid var(--seal-line); }
+.seal-hairline-r { border-right: 1px solid var(--seal-line); }
+
+.seal-mark {
+  border-radius: 50%;
+  background: var(--seal-red);
+  color: var(--seal-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--seal-serif);
+}
+
+.seal-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--seal-red);
+  text-transform: uppercase;
+  letter-spacing: 0.17em;
+}
+
+.seal-eyebrow::before {
+  content: "";
+  width: 2.75rem;
+  height: 1px;
+  background: var(--seal-red);
+}
+
+.seal-btn-ink {
+  background: var(--seal-ink);
+  color: var(--seal-paper);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.seal-btn-ink:hover { background: #2a2831; }
+
+.seal-panel {
+  background: var(--seal-panel);
+  color: var(--seal-panel-text);
+}
+
+.seal-panel-muted { color: var(--seal-panel-muted); }
+
+.seal-panel .seal-label,
+.seal-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.17em;
+  color: var(--seal-faint);
+}
+
+.seal-panel .seal-label { color: var(--seal-panel-muted); }
+
+.seal-field-panel {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--seal-panel-line);
+  border-radius: 0;
+  padding: 0.5rem 0 0.75rem;
+  font-size: 16px;
+  color: var(--seal-panel-text);
+  font-family: inherit;
+}
+
+.seal-field-panel::placeholder { color: var(--seal-panel-muted); }
+
+.seal-field-panel:focus {
+  outline: none;
+  border-bottom-color: var(--seal-red);
+  box-shadow: 0 1px 0 var(--seal-red);
+}
+
+.seal-link-panel { color: var(--seal-red-soft); }
+.seal-link-panel:hover { color: var(--seal-panel-text); }
+
+.seal-alert-error {
+  background: var(--seal-danger-bg);
+  border: 1px solid var(--seal-danger-border);
+  color: var(--seal-danger);
+}
+
+.seal-alert-error--panel {
+  background: rgba(200, 68, 44, 0.16);
+  border: 1px solid rgba(200, 68, 44, 0.45);
+  color: #f0b5a5;
+}
+
+/* Grille éditoriale de la page d'accueil */
+.seal-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.seal-cell {
+  padding: 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--seal-line);
+}
+
+@media (min-width: 640px) {
+  .seal-grid { grid-template-columns: repeat(2, 1fr); }
+  .seal-cell:nth-child(odd) { border-right: 1px solid var(--seal-line); }
+}
+
+@media (min-width: 1024px) {
+  .seal-grid { grid-template-columns: repeat(4, 1fr); }
+  .seal-cell { border-right: 1px solid var(--seal-line); }
+  .seal-cell:nth-child(4n) { border-right: none; }
+  .seal-cell:nth-child(n+5) { border-bottom: none; }
+}
+
+.seal-cell-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--seal-red);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid var(--seal-red);
+  padding-bottom: 2px;
+}
+
+.seal-cell-link:hover { color: var(--seal-red-dark); border-bottom-width: 2px; }
+
+/* Cercles concentriques décoratifs (bande CTA) */
+.seal-rings {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 68, 44, 0.35);
+  pointer-events: none;
+}
+
+/* Apparition douce du hero (accueil uniquement) */
+@keyframes seal-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.seal-rise { animation: seal-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.seal-rise--2 { animation-delay: 0.12s; }
+.seal-rise--3 { animation-delay: 0.24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .seal-rise, .seal-rise--2, .seal-rise--3 { animation: none; }
+}

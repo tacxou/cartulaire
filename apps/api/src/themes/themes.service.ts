@@ -7,6 +7,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { parse as parseYaml } from 'yaml'
 import { SettingsService } from '~/settings/settings.service'
+import { BrandingDto } from '~/settings/settings.dto'
 import { scanThemeOverrides, ThemeAwareLoader } from './theme-loader'
 import { ThemeManifestDto, ThemeViewContext, ViewLocals } from './themes.dto'
 
@@ -96,7 +97,7 @@ export class ThemesService implements OnModuleInit, OnModuleDestroy {
         `Thème "${ui.theme}" introuvable. Thèmes disponibles : ${[...this.manifests.keys()].join(', ')}`,
       )
     }
-    return this.buildThemeContext(manifest, ui.themeOverrides, pageKey)
+    return this.buildThemeContext(manifest, ui.themeOverrides, this.resolveBranding(manifest), pageKey)
   }
 
   public getPageScript(themeId: string, pageKey: string): string | undefined {
@@ -104,9 +105,16 @@ export class ThemesService implements OnModuleInit, OnModuleDestroy {
   }
 
   public getViewLocals(pageKey?: string): ViewLocals {
-    const branding = this.settings.getBranding()
+    const ui = this.settings.getUi()
+    const manifest = this.manifests.get(ui.theme)
+    if (!manifest) {
+      throw new Error(
+        `Thème "${ui.theme}" introuvable. Thèmes disponibles : ${[...this.manifests.keys()].join(', ')}`,
+      )
+    }
+    const branding = this.resolveBranding(manifest)
     const prefs = this.settings.getPrefs()
-    const theme = this.getActiveTheme(pageKey)
+    const theme = this.buildThemeContext(manifest, ui.themeOverrides, branding, pageKey)
 
     return {
       theme,
@@ -172,6 +180,7 @@ export class ThemesService implements OnModuleInit, OnModuleDestroy {
         version: raw.version,
         author: raw.author,
         variables,
+        branding: raw.branding,
         fontGoogleUrl,
       },
       { enableImplicitConversion: true },
@@ -202,24 +211,22 @@ export class ThemesService implements OnModuleInit, OnModuleDestroy {
   private buildThemeContext(
     manifest: ThemeManifestDto,
     overrides: Record<string, string> = {},
+    branding: BrandingDto,
     pageKey?: string,
   ): ThemeViewContext {
     const merged = { ...manifest.variables, ...overrides }
-    const { fontGoogleUrl: _fontUrl, ...cssVars } = merged
-    void _fontUrl
 
     const themeDir = join(this.themesRoot, manifest.id)
     const overrideCss = this.readOptionalFile(join(themeDir, 'theme.css'))
     const extraCss = this.readStylesheets(join(themeDir, 'assets', 'styles'))
 
-    const variablesBlock = Object.entries(cssVars)
-      .filter(([key]) => !key.startsWith('font-'))
+    const variablesBlock = Object.entries(merged)
+      .filter(([key]) => key !== 'font-google-url')
       .map(([key, value]) => `  --${key}: ${value};`)
       .join('\n')
 
-    const branding = this.settings.getBranding()
     const brandingVars = [
-      `  --bg-image: url('${branding.backgroundImage}');`,
+      `  --bg-image: ${this.formatBackgroundImage(branding.backgroundImage)};`,
       `  --color-bg-body: ${branding.backgroundColor};`,
       `  --bg-overlay-opacity: ${branding.backgroundColorOpacity};`,
     ].join('\n')
@@ -254,6 +261,23 @@ export class ThemesService implements OnModuleInit, OnModuleDestroy {
       overrides: scanThemeOverrides(this.themesRoot, manifest.id),
       assetsBaseUrl: '/theme-assets',
     }
+  }
+
+  private formatBackgroundImage(backgroundImage: string): string {
+    const trimmed = backgroundImage.trim()
+    return trimmed ? `url('${trimmed}')` : 'none'
+  }
+
+  private resolveBranding(manifest: ThemeManifestDto): BrandingDto {
+    return plainToInstance(
+      BrandingDto,
+      {
+        ...this.settings.getDefaultBranding(),
+        ...manifest.branding,
+        ...this.settings.getBrandingOverrides(),
+      },
+      { enableImplicitConversion: true, exposeDefaultValues: true },
+    )
   }
 
   private readStylesheets(stylesDir: string): string[] {

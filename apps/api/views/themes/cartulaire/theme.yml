@@ -4,6 +4,13 @@ description: Violet glassmorphism — carte split, reflets et lueurs
 version: "1.1.0"
 author: Cartulaire
 
+branding:
+  appName: Cartulaire
+  logo: /assets/logo.png
+  backgroundImage: /assets/background.svg
+  backgroundColor: "#09090b"
+  backgroundColorOpacity: 0.8
+
 variables:
   font-family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui, sans-serif'
   font-index-family: "'Sora', sans-serif"

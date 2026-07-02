@@ -5,7 +5,7 @@ import { watch, FSWatcher } from 'chokidar'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { parse as parseYaml } from 'yaml'
-import { SettingsDto } from './settings.dto'
+import { BrandingDto, BrandingOverridesDto, SettingsDto } from './settings.dto'
 
 const SETTINGS_FILE = 'settings.yml'
 
@@ -46,6 +46,14 @@ export class SettingsService implements OnModuleInit, OnModuleDestroy {
 
   public getBranding(): SettingsDto['branding'] {
     return this.getSettings().branding
+  }
+
+  public getBrandingOverrides(): BrandingOverridesDto {
+    return this.getSettings().branding ?? {}
+  }
+
+  public getDefaultBranding(): BrandingDto {
+    return plainToInstance(BrandingDto, {}, { exposeDefaultValues: true })
   }
 
   public getPrefs(): SettingsDto['prefs'] {

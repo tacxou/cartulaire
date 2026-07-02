@@ -82,9 +82,13 @@
     const countdownElement = document.getElementById('redirect-countdown')
     const backButton = document.getElementById('back-button')
     const canGoBack = window.history.length > 1
-    let remainingSeconds = 10
+    const initialSeconds = 10
+    let remainingSeconds = initialSeconds
+    let hasRedirected = false
 
     const redirect = () => {
+      if (hasRedirected) return
+      hasRedirected = true
       if (canGoBack) {
         window.history.back()
         return
@@ -92,10 +96,15 @@
       window.location.assign(fallbackUrl)
     }
 
+    if (countdownElement) {
+      countdownElement.textContent = String(initialSeconds)
+    }
+
     if (backButton) {
       backButton.addEventListener('click', redirect)
     }
 
+    const timeout = window.setTimeout(redirect, initialSeconds * 1_000)
     const interval = window.setInterval(function () {
       remainingSeconds -= 1
       if (countdownElement) {
@@ -104,9 +113,9 @@
 
       if (remainingSeconds <= 0) {
         window.clearInterval(interval)
-        redirect()
+        window.clearTimeout(timeout)
       }
-    }, 1000)
+    }, 1_000)
   })()
 </script>
 {% endblock %}

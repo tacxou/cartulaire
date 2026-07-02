@@ -1,0 +1,58 @@
+{% extends "layouts/main.njk" %}
+
+{% block content %}
+<div class="w-full max-w-md">
+  <div class="flex flex-col items-center text-center mb-7">
+    <img src="{{ branding.logo }}" width="96" height="96" alt="{{ branding.appName }}"
+      class="w-14 h-14 object-contain select-none" />
+    <h1 class="mt-5 text-[22px] font-bold tracking-tight flat-ink">Connexion à {{ branding.appName }}</h1>
+    <p class="mt-1.5 text-[14px] flat-faint">Saisissez vos identifiants</p>
+  </div>
+
+  {% if errorMessage %}
+  <div class="flat-alert-error rounded-lg px-4 py-3 text-sm mb-5">
+    {{ errorMessage }}
+  </div>
+  {% endif %}
+
+  <div class="flat-card rounded-xl p-7">
+    <form action="/interaction/{{ uid }}" method="POST" autocomplete="off" class="space-y-5">
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+      <div>
+        <label for="username" class="block text-[13px] font-semibold flat-body mb-1.5">Identifiant</label>
+        <input type="text" name="username" id="username" value="{{ form.username | default('') }}" required
+          class="glass-field block w-full px-3 py-2.5 text-[14px] transition" />
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <label for="password" class="text-[13px] font-semibold flat-body">Mot de passe</label>
+          <a href="/forgot-password" class="flat-link text-[12px] font-medium transition">
+            Mot de passe oublié ?
+          </a>
+        </div>
+        <input type="password" name="password" id="password" required
+          class="glass-field block w-full px-3 py-2.5 text-[14px] transition" />
+      </div>
+
+      <button type="submit"
+        class="btn-primary w-full px-4 py-2.5 text-[14px] transition active:scale-[0.99]">
+        Se connecter
+      </button>
+    </form>
+  </div>
+
+  <p class="text-center text-[13px] flat-faint mt-5">
+    Pas encore de compte ?
+    <a href="/register" class="flat-link font-semibold transition">Créer un compte</a>
+  </p>
+
+  <div class="flex items-center justify-center gap-3 mt-7">
+    <span class="text-[11px] flat-faint">Authentification OIDC</span>
+    <span class="w-[3px] h-[3px] rounded-full flat-dot-success opacity-40"></span>
+    <span class="text-[11px] flat-faint">Chiffrement TLS</span>
+    <span class="w-[3px] h-[3px] rounded-full flat-dot-success opacity-40"></span>
+    <span class="text-[11px] flat-faint truncate max-w-[10rem]" title="{{ issuerHost }}">{{ issuerHost }}</span>
+  </div>
+</div>
+{% endblock %}

@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer'
-import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator'
+import { IsNotEmpty, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator'
+import { BrandingDto } from '~/settings/settings.dto'
 
 export class ThemeManifestDto {
   @IsString()
@@ -24,6 +25,11 @@ export class ThemeManifestDto {
 
   @IsObject()
   variables: Record<string, string>
+
+  @ValidateNested()
+  @Type(() => BrandingDto)
+  @IsOptional()
+  branding?: BrandingDto
 
   @IsString()
   @IsOptional()
@@ -56,13 +62,7 @@ export interface ThemeViewContext {
 
 export interface ViewLocals {
   theme: ThemeViewContext
-  branding: {
-    appName: string
-    logo: string
-    backgroundImage: string
-    backgroundColor: string
-    backgroundColorOpacity: number
-  }
+  branding: BrandingDto
   prefs: {
     defaultLanguage: string
     allowRegistration: boolean

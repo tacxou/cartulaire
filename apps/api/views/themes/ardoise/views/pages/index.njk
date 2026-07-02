@@ -1,0 +1,148 @@
+{% extends "layouts/main.njk" %}
+
+{% set fullWidth = true %}
+
+{% block content %}
+<div class="page-index relative min-h-screen flex flex-col">
+
+  <header class="flat-header relative z-20 flex flex-wrap items-center justify-between gap-4 px-6 sm:px-12 py-3.5">
+    <div class="flex items-center gap-3">
+      <div class="brand-icon w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+        {{ icon('shield-check', {width: 16, height: 16, class: 'text-white'}) }}
+      </div>
+      <span class="text-[14px] font-bold flat-ink tracking-[.5px] uppercase">{{ branding.appName }}</span>
+      <span class="flat-pill-success hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold">
+        <span class="flat-dot-success w-1.5 h-1.5 rounded-full dot-live"></span>
+        SSO actif
+      </span>
+    </div>
+
+    <nav class="flex flex-wrap items-center justify-end gap-3 sm:gap-5 w-full sm:w-auto">
+      <a href="#" class="text-[13px] flat-muted font-medium hover:underline">Documentation</a>
+      <a href="#" class="text-[13px] flat-muted font-medium hover:underline">Support</a>
+      <span class="text-[13px] flat-faint flat-mono truncate max-w-[12rem]" title="{{ issuerHost }}">{{ issuerHost }}</span>
+      <a href="/login" class="btn-primary flex items-center gap-2 px-4 py-2 text-[13px] transition-all">
+        {{ icon('log-in', {width: 14, height: 14}) }}
+        Connexion
+      </a>
+    </nav>
+  </header>
+
+  <main class="relative z-10 flex-1 max-w-[1100px] w-full mx-auto px-6 sm:px-12">
+    <section class="pt-10 sm:pt-12 pb-8 max-w-xl">
+      <div class="flat-chip inline-flex items-center gap-2 px-3 py-1 rounded-md text-[11px] font-semibold tracking-[.6px] uppercase mb-5">
+        {{ icon('shield-check', {width: 11, height: 11}) }}
+        Serveur d'identité OIDC
+      </div>
+
+      <h1 class="text-[clamp(1.6rem,4vw,2.4rem)] font-bold flat-ink leading-[1.15] tracking-tight mb-3.5">
+        Une identité. Tous vos accès.
+      </h1>
+      <p class="text-[15px] flat-muted leading-relaxed">
+        Connectez-vous à vos applications via votre identité unique.
+        Authentification OIDC · chiffrement de bout en bout.
+      </p>
+    </section>
+
+    <section class="mb-5">
+      <div class="flex items-center gap-2.5 mb-4">
+        <span class="text-[12px] font-bold flat-faint tracking-[1px] uppercase">Applications disponibles</span>
+        <span class="flat-chip text-[11px] font-bold px-2 py-0.5 rounded-md">7</span>
+      </div>
+
+      {% set apps = [
+        {"name": "Messagerie", "cat": "Communication", "desc": "Courrier et notifications internes", "users": "89", "client": "messagerie", "ic": "mail", "tile": "sky"},
+        {"name": "Calendrier", "cat": "Productivité", "desc": "Agenda partagé et planification", "users": "64", "client": "calendrier", "ic": "calendar", "tile": "green"},
+        {"name": "Documents", "cat": "Productivité", "desc": "Gestion et partage de fichiers", "users": "117", "client": "documents", "ic": "file-text", "tile": "amber"},
+        {"name": "Portail RH", "cat": "Ressources Humaines", "desc": "Congés, paie et suivi des équipes", "users": "38", "client": "rh", "ic": "users", "tile": "pink"},
+        {"name": "Wiki Interne", "cat": "Documentation", "desc": "Base de connaissances centralisée", "users": "142", "client": "wiki", "ic": "book", "tile": "indigo"},
+        {"name": "Supervision", "cat": "Infrastructure", "desc": "Monitoring, alertes et métriques", "users": "12", "client": "supervision", "ic": "line-chart", "tile": "teal"},
+        {"name": "Helpdesk", "cat": "Support", "desc": "Tickets et gestion des incidents", "users": "55", "client": "helpdesk", "ic": "radar", "tile": "violet"}
+      ] %}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {% for app in apps %}
+        <div class="flat-card flat-card--hover rounded-[10px] p-[18px]">
+          <div class="flex items-start justify-between mb-3.5">
+            <div class="flat-tile flat-tile--{{ app.tile }} w-10 h-10">
+              {{ icon(app.ic, {width: 18, height: 18}) }}
+            </div>
+            <span class="flat-dot-success w-[7px] h-[7px] rounded-full mt-1"></span>
+          </div>
+          <div class="text-[14px] font-semibold flat-ink mb-0.5">{{ app.name }}</div>
+          <div class="text-[11px] flat-faint mb-1">{{ app.cat }}</div>
+          <div class="text-[12px] flat-faint leading-relaxed mb-3.5">{{ app.desc }}</div>
+          <div class="flat-divider flex items-center justify-between pt-3">
+            <span class="flex items-center gap-1.5 text-[12px] flat-faint">
+              {{ icon('user', {width: 11, height: 11}) }}{{ app.users }}
+            </span>
+            <a href="/auth?client={{ app.client }}" class="flat-link text-[12px] font-semibold transition">Accéder →</a>
+          </div>
+        </div>
+        {% endfor %}
+
+        <div class="flat-card rounded-[10px] p-[18px] opacity-60 cursor-not-allowed select-none">
+          <div class="flex items-start justify-between mb-3.5">
+            <div class="flat-tile flat-tile--gray w-10 h-10">
+              {{ icon('layout-dashboard', {width: 18, height: 18}) }}
+            </div>
+            <span class="flat-chip text-[10px] font-bold px-2 py-0.5 rounded-md">Bientôt</span>
+          </div>
+          <div class="text-[14px] font-semibold flat-muted mb-0.5">Dashboard</div>
+          <div class="text-[11px] flat-faint mb-1">Analytics</div>
+          <div class="text-[12px] flat-faint leading-relaxed mb-3.5">Tableaux de bord personnalisés</div>
+          <div class="flat-divider flex items-center justify-between pt-3">
+            <span class="text-[12px] flat-faint">—</span>
+            <span class="text-[12px] font-medium flat-faint">Indisponible</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="flat-band rounded-xl flex flex-col lg:flex-row items-stretch lg:items-center gap-6 p-7 sm:px-8 mb-12">
+      <div class="brand-icon w-12 h-12 rounded-[10px] flex items-center justify-center shrink-0 mx-auto lg:mx-0">
+        {{ icon('shield-check', {width: 22, height: 22, class: 'text-white'}) }}
+      </div>
+
+      <div class="flex-1 text-center lg:text-left">
+        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 mb-1.5">
+          <span class="text-[16px] font-bold tracking-[.5px]">Compte {{ branding.appName }}</span>
+          <span class="flat-band-chip text-[10px] font-bold px-2 py-0.5 rounded-md tracking-[.5px] uppercase">Compte natif</span>
+        </div>
+        <p class="flat-band-muted text-[13px] leading-relaxed max-w-lg mx-auto lg:mx-0">
+          Connectez-vous directement avec vos identifiants Cartulaire pour accéder à l'ensemble de votre espace, gérer vos applications et administrer vos accès.
+        </p>
+        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 mt-2.5">
+          <span class="flat-band-muted flex items-center gap-1.5 text-[11px]">
+            {{ icon('shield-check', {width: 11, height: 11}) }}Chiffrement TLS
+          </span>
+          <span class="flat-band-muted flex items-center gap-1.5 text-[11px]">
+            {{ icon('clock', {width: 11, height: 11}) }}Session 8h
+          </span>
+          <span class="flat-band-muted flex items-center gap-1.5 text-[11px]">
+            {{ icon('fingerprint', {width: 11, height: 11}) }}MFA disponible
+          </span>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row lg:flex-col gap-2.5 shrink-0 w-full max-w-sm mx-auto lg:mx-0 lg:w-auto">
+        <a href="/login" class="flat-btn-inverse flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-[13px] transition-all">
+          {{ icon('log-in', {width: 14, height: 14}) }}
+          Se connecter
+        </a>
+        <a href="/register" class="flat-btn-outline-inverse flex items-center justify-center px-6 py-2.5 rounded-lg text-[13px] transition-all">
+          Créer un compte
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="flat-footer relative z-10 px-6 sm:px-12 py-4 flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3">
+    <span class="text-[12px] flat-faint">{{ branding.appName }} · Fournisseur d'identité OIDC · Libertech</span>
+    <div class="flex items-center gap-2">
+      <span class="flat-dot-success w-[7px] h-[7px] rounded-full"></span>
+      <span class="text-[12px] flat-faint">Tous les services opérationnels</span>
+    </div>
+  </footer>
+</div>
+{% endblock %}
