@@ -41,13 +41,15 @@ export class ClientDto {
   @IsOptional()
   token_endpoint_auth_method?: ClientAuthMethod
 
+  // `require_tld: false` : autorise les URLs `http://localhost:…` en dev
+  // (par défaut @IsUrl exige un TLD et rejette localhost).
   @IsArray()
-  @IsUrl({}, { each: true })
+  @IsUrl({ require_tld: false }, { each: true })
   @IsOptional()
   redirect_uris?: string[]
 
   @IsArray()
-  @IsUrl({}, { each: true })
+  @IsUrl({ require_tld: false }, { each: true })
   @IsOptional()
   post_logout_redirect_uris?: string[]
 

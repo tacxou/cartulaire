@@ -11,13 +11,15 @@ import { Client, KoaContextWithOIDC, ResourceServer } from 'oidc-provider'
  * @returns string | string[]
  */
 export function resourceIndicatorsDefaultResource(
-  ctx: KoaContextWithOIDC,
-  client: Client,
-  oneOf?: string[] | undefined,
-): string | string[] {
-  console.log('defaultResource', oneOf, client)
-
-  return ctx.oidc.issuer
+  _ctx: KoaContextWithOIDC,
+  _client: Client,
+  _oneOf?: string[] | undefined,
+): string | string[] | undefined {
+  // Pas de resource par défaut : sans `resource=` explicite du RP, l'access token
+  // reste opaque et garde ses capacités OIDC (userinfo). Retourner l'issuer ici
+  // liait TOUT access token à un resource server JWT (scope client vide) et
+  // cassait `/oidc/me` pour les clients OIDC standards (invalid_token).
+  return undefined
 }
 
 /**
